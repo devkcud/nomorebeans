@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@plugin 'daisyui' {
+    logs: false;
+    themes:
+        winter --default,
+        night;
+}
