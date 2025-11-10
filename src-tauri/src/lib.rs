@@ -1,9 +1,28 @@
-use tauri::{generate_context, generate_handler, Builder};
+pub mod command;
+pub mod models;
+pub mod repositories;
+pub mod services;
+pub mod state;
+
+use dotenvy::dotenv;
+use sqlx::PgPool;
+use std::env;
+use tauri::{async_runtime, generate_context, generate_handler, Builder};
+
+use crate::state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    Builder::default()
-        .invoke_handler(generate_handler![])
-        .run(generate_context!())
-        .expect("error while running tauri application");
+    dotenv().ok();
+    async_runtime::block_on(async {
+        let pool = PgPool::connect(&env::var("DATABASE_URL").expect("DATABASE_URL not set"))
+            .await
+            .expect("Failed to connect to database");
+
+        Builder::default()
+            .manage(AppState::new(pool))
+            .invoke_handler(generate_handler![command::get_profiles])
+            .run(generate_context!())
+            .expect("error while running tauri application");
+    });
 }
