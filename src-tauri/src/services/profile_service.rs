@@ -1,4 +1,4 @@
-use crate::{repositories, services::domain::models::profile_domain_model::ProfileDomainModel};
+use crate::{repositories, services::dto::profile_dto::GetProfileDTO};
 use sqlx::Error;
 
 #[derive(Clone)]
@@ -11,8 +11,8 @@ impl ProfileService {
         Self { repo }
     }
 
-    pub async fn get_all(&self) -> Result<Vec<ProfileDomainModel>, Error> {
+    pub async fn get_all(&self) -> Result<Vec<GetProfileDTO>, Error> {
         let users = self.repo.get_profiles().await?;
-        Ok(users.into_iter().map(ProfileDomainModel::from).collect())
+        Ok(users.into_iter().map(GetProfileDTO::from).collect())
     }
 }

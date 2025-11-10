@@ -1,8 +1,8 @@
-use crate::{services::domain::models::profile_domain_model::ProfileDomainModel, state::AppState};
+use crate::{services::dto::profile_dto::GetProfileDTO, state::AppState};
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_profiles(state: State<'_, AppState>) -> Result<Vec<ProfileDomainModel>, String> {
+pub async fn get_profiles(state: State<'_, AppState>) -> Result<Vec<GetProfileDTO>, String> {
     state
         .profile_service
         .get_all()
