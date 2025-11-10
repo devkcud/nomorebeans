@@ -43,6 +43,20 @@
     </div>
 </div>
 
+<header class="navbar fixed top-10">
+    <button class="group btn btn-square btn-sm" aria-label="logout">
+        <iconify-icon icon="mdi:users" class="text-sm"></iconify-icon>
+    </button>
+
+    <div class="grow"></div>
+
+    <label class="btn swap btn-square swap-rotate btn-sm">
+        <input type="checkbox" class="theme-controller hidden" value="light" />
+        <iconify-icon icon="bxs:sun" class="swap-off"></iconify-icon>
+        <iconify-icon icon="bxs:moon" class="swap-on"></iconify-icon>
+    </label>
+</header>
+
 <div class="h-screen overflow-auto pt-10">
     {@render children()}
 </div>
