@@ -21,6 +21,7 @@ pub fn run() {
 
         Builder::default()
             .manage(AppState::new(pool))
+            .plugin(tauri_plugin_fs::init())
             .invoke_handler(generate_handler![command::get_profiles])
             .run(generate_context!())
             .expect("error while running tauri application");

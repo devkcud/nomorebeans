@@ -1,4 +1,4 @@
-use sqlx::PgPool;
+use sqlx::{Error, PgPool};
 
 use crate::models::v1::profile_model;
 
@@ -12,7 +12,7 @@ impl ProfileRepository {
         Self { pool }
     }
 
-    pub async fn get_profiles(&self) -> Result<Vec<profile_model::ProfileModel>, sqlx::Error> {
+    pub async fn get_profiles(&self) -> Result<Vec<profile_model::ProfileModel>, Error> {
         let profiles = sqlx::query_as::<_, profile_model::ProfileModel>("SELECT * FROM profiles")
             .fetch_all(&self.pool)
             .await?;
