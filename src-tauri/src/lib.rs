@@ -3,6 +3,7 @@ pub mod models;
 pub mod repositories;
 pub mod services;
 pub mod state;
+pub mod utils;
 
 use dotenvy::dotenv;
 use sqlx::PgPool;
@@ -22,7 +23,10 @@ pub fn run() {
         Builder::default()
             .manage(AppState::new(pool))
             .plugin(tauri_plugin_fs::init())
-            .invoke_handler(generate_handler![command::get_profiles])
+            .invoke_handler(generate_handler![
+                command::get_profiles,
+                command::create_profile,
+            ])
             .run(generate_context!())
             .expect("error while running tauri application");
     });
