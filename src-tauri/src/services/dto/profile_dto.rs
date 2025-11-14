@@ -11,6 +11,8 @@ static USERNAME_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[a-z0-9]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileDTO {
     pub id: i32,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
     pub username: String,
     pub display_name: Option<String>,
     pub avatar: Option<String>,
@@ -56,6 +58,8 @@ impl TryFrom<ProfileModel> for GetProfileDTO {
 
         Ok(Self {
             id: model.id,
+            created_at: model.created_at,
+            updated_at: model.updated_at,
             username: model.username,
             display_name: model.display_name,
             avatar,
