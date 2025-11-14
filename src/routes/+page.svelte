@@ -22,7 +22,6 @@
     let createProfileFileInput: HTMLInputElement;
 
     let createProfileError = $state<ErrorResponse | undefined>(undefined);
-    $inspect(createProfileError, 'createProfileError');
 
     async function handleCreateProfile(e: Event) {
         e.preventDefault();
