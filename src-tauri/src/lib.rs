@@ -26,6 +26,8 @@ pub fn run() {
             .invoke_handler(generate_handler![
                 command::get_profiles,
                 command::create_profile,
+                command::get_profile_by_id,
+                command::get_profile_by_username,
             ])
             .run(generate_context!())
             .expect("error while running tauri application");
