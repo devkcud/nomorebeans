@@ -37,7 +37,7 @@ impl ProfileService {
     }
 
     pub async fn get_all(&self) -> Result<Vec<GetProfileDTO>, ErrorResponse> {
-        let users: Vec<ProfileModel> = self.repo.get_profiles().await?;
+        let users: Vec<ProfileModel> = self.repo.get_all().await?;
         let dtos: Result<Vec<_>, _> = users.into_iter().map(GetProfileDTO::try_from).collect();
 
         dtos.map_err(|_| ErrorResponse::unhandled()) // TODO: improve error handling

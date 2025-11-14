@@ -50,7 +50,7 @@ impl ProfileRepository {
         Ok(created_profile)
     }
 
-    pub async fn get_profiles(&self) -> Result<Vec<profile_model::ProfileModel>, ErrorResponse> {
+    pub async fn get_all(&self) -> Result<Vec<profile_model::ProfileModel>, ErrorResponse> {
         let profiles = sqlx::query_as::<_, profile_model::ProfileModel>(
             r#"
             SELECT * FROM profiles WHERE deleted_at IS NULL
