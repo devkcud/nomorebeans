@@ -1,6 +1,9 @@
-use sqlx::{Error, PgPool};
+use sqlx::PgPool;
 
-use crate::{models::v1::profile_model, utils::fs::profile_picture};
+use crate::{
+    models::v1::profile_model,
+    utils::{error::mapping::ErrorResponse, fs::profile_picture},
+};
 
 #[derive(Clone)]
 pub struct ProfileRepository {
@@ -17,10 +20,9 @@ impl ProfileRepository {
         username: String,
         display_name: Option<String>,
         profile_picture_bytes: Option<Vec<u8>>,
-    ) -> Result<profile_model::ProfileModel, Error> {
+    ) -> Result<profile_model::ProfileModel, ErrorResponse> {
         let profile_picture_url = if let Some(bytes) = profile_picture_bytes {
-            let path = profile_picture::save_profile_picture(&bytes)
-                .map_err(|e| Error::Protocol(e.to_string().into()))?;
+            let path = profile_picture::save_profile_picture(&bytes)?;
             Some(path.to_string_lossy().to_string())
         } else {
             None
@@ -48,7 +50,7 @@ impl ProfileRepository {
         Ok(created_profile)
     }
 
-    pub async fn get_profiles(&self) -> Result<Vec<profile_model::ProfileModel>, Error> {
+    pub async fn get_profiles(&self) -> Result<Vec<profile_model::ProfileModel>, ErrorResponse> {
         let profiles = sqlx::query_as::<_, profile_model::ProfileModel>("SELECT * FROM profiles")
             .fetch_all(&self.pool)
             .await?;

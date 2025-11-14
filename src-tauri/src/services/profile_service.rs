@@ -1,8 +1,9 @@
 use crate::{
+    models::v1::profile_model::ProfileModel,
     repositories,
     services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO},
+    utils::error::mapping::ErrorResponse,
 };
-use sqlx::Error;
 use validator::Validate;
 
 #[derive(Clone)]
@@ -15,10 +16,11 @@ impl ProfileService {
         Self { repo }
     }
 
-    pub async fn create_profile(&self, profile: CreateProfileDTO) -> Result<GetProfileDTO, Error> {
-        profile
-            .validate()
-            .map_err(|e| Error::Protocol(e.to_string().into()))?;
+    pub async fn create_profile(
+        &self,
+        profile: CreateProfileDTO,
+    ) -> Result<GetProfileDTO, ErrorResponse> {
+        profile.validate()?;
 
         let profile = self
             .repo
@@ -29,15 +31,15 @@ impl ProfileService {
             )
             .await?;
 
-        let dto = GetProfileDTO::try_from(profile).map_err(|e| Error::Protocol(e.into()))?;
+        let dto = GetProfileDTO::try_from(profile).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
 
         Ok(dto)
     }
 
-    pub async fn get_all(&self) -> Result<Vec<GetProfileDTO>, Error> {
-        let users = self.repo.get_profiles().await?;
+    pub async fn get_all(&self) -> Result<Vec<GetProfileDTO>, ErrorResponse> {
+        let users: Vec<ProfileModel> = self.repo.get_profiles().await?;
         let dtos: Result<Vec<_>, _> = users.into_iter().map(GetProfileDTO::try_from).collect();
 
-        dtos.map_err(|e| Error::Protocol(e.into()))
+        dtos.map_err(|_| ErrorResponse::unhandled()) // TODO: improve error handling
     }
 }
