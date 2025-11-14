@@ -5,9 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, fs, sync::LazyLock};
 use validator::{Validate, ValidationError};
 
-static USERNAME_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[a-z0-9._-]+$").unwrap());
-static DISPLAY_NAME_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9 ]+$").unwrap());
+static USERNAME_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[a-z0-9]+$").unwrap());
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -29,22 +27,16 @@ pub struct CreateProfileDTO {
         ),
         regex(
             path = *USERNAME_REGEX,
-            message = "Username can only contain lowercase letters, numbers, dots, hyphens, and underscores"
+            message = "Username can only contain lowercase letters and numbers"
         )
     )]
     pub username: String,
 
-    #[validate(
-        length(
-            min = 1,
-            max = 32,
-            message = "Display name must be between 1 and 32 characters"
-        ),
-        regex(
-            path = *DISPLAY_NAME_REGEX,
-            message = "Display name can only contain letters and numbers"
-        )
-    )]
+    #[validate(length(
+        min = 1,
+        max = 32,
+        message = "Display name must be between 1 and 32 characters"
+    ))]
     pub display_name: Option<String>,
 
     #[validate(custom(function = "validate_profile_picture_size"))]
