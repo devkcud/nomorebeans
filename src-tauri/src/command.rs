@@ -17,3 +17,19 @@ pub async fn create_profile(
 ) -> Result<GetProfileDTO, ErrorResponse> {
     state.profile_service.create_profile(profile).await
 }
+
+#[tauri::command]
+pub async fn get_profile_by_id(
+    state: State<'_, AppState>,
+    id: i32,
+) -> Result<GetProfileDTO, ErrorResponse> {
+    state.profile_service.get_one_by_id(id).await
+}
+
+#[tauri::command]
+pub async fn get_profile_by_username(
+    state: State<'_, AppState>,
+    username: &str,
+) -> Result<GetProfileDTO, ErrorResponse> {
+    state.profile_service.get_one_by_username(username).await
+}

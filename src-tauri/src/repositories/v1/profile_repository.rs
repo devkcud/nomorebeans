@@ -61,4 +61,36 @@ impl ProfileRepository {
 
         Ok(profiles)
     }
+
+    pub async fn get_one_by_id(
+        &self,
+        profile_id: i32,
+    ) -> Result<Option<profile_model::ProfileModel>, ErrorResponse> {
+        let profile = sqlx::query_as::<_, profile_model::ProfileModel>(
+            r#"
+            SELECT * FROM profiles WHERE id = $1 AND deleted_at IS NULL
+            "#,
+        )
+        .bind(profile_id)
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(profile)
+    }
+
+    pub async fn get_one_by_username(
+        &self,
+        profile_username: String,
+    ) -> Result<Option<profile_model::ProfileModel>, ErrorResponse> {
+        let profile = sqlx::query_as::<_, profile_model::ProfileModel>(
+            r#"
+            SELECT * FROM profiles WHERE username = $1 AND deleted_at IS NULL
+            "#,
+        )
+        .bind(profile_username)
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(profile)
+    }
 }
