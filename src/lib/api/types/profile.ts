@@ -1,7 +1,7 @@
 export type Profile = {
     id: number;
     username: string;
-    display_name?: string;
+    displayName?: string;
     avatar?: string;
 };
 

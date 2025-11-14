@@ -10,6 +10,7 @@ static DISPLAY_NAME_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9 ]+$").unwrap());
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GetProfileDTO {
     pub id: i32,
     pub username: String,
@@ -18,6 +19,7 @@ pub struct GetProfileDTO {
 }
 
 #[derive(Debug, Clone, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateProfileDTO {
     #[validate(
         length(
@@ -43,7 +45,6 @@ pub struct CreateProfileDTO {
             message = "Display name can only contain letters and numbers"
         )
     )]
-    #[serde(rename = "displayName")]
     pub display_name: Option<String>,
 
     #[validate(custom(function = "validate_profile_picture_size"))]
