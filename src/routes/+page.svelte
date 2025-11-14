@@ -1,5 +1,6 @@
 <script lang="ts">
     import { createProfile, getProfiles } from '$lib/api/profile-service';
+    import type { ErrorResponse } from '$lib/api/types/error';
     import type { Profile } from '$lib/api/types/profile';
     import { fade } from 'svelte/transition';
 
@@ -14,15 +15,19 @@
             ? URL.createObjectURL(profilePicture)
             : `https://api.dicebear.com/9.x/thumbs/svg?seed=${username}`
     );
+    let createProfileLoading = $state(false);
 
     let createProfileModal: HTMLDialogElement;
     let createProfileForm: HTMLFormElement;
     let createProfileFileInput: HTMLInputElement;
 
-    let createProfileError = $state<string | undefined>(undefined);
+    let createProfileError = $state<ErrorResponse | undefined>(undefined);
+    $inspect(createProfileError, 'createProfileError');
 
     async function handleCreateProfile(e: Event) {
         e.preventDefault();
+
+        createProfileLoading = true;
 
         try {
             await createProfile({
@@ -36,7 +41,9 @@
             createProfileModal.close();
             await handleCancelCreateProfile();
         } catch (err: any) {
-            createProfileError = err;
+            createProfileError = err as ErrorResponse;
+        } finally {
+            createProfileLoading = false;
         }
     }
 
@@ -99,20 +106,20 @@
 
         {#if layout === 'grid'}
             <section class="flex max-w-5xl flex-wrap justify-center gap-6 *:shrink-0">
-                {#each profiles as { id, username, display_name, avatar: avatar_url } (id)}
+                {#each profiles as { id, username, displayName, avatar } (id)}
                     <button
-                        class="flex cursor-pointer flex-col items-center space-y-2 text-center transition-transform hover:scale-105"
+                        class="group flex cursor-pointer flex-col items-center space-y-2 text-center transition-transform hover:scale-110 focus:scale-110 focus:outline-0"
                     >
                         <img
-                            src={avatar_url ??
+                            src={avatar ??
                                 `https://api.dicebear.com/9.x/thumbs/svg?seed=${username}`}
                             alt={username}
-                            class="size-32 rounded-md bg-base-300 object-cover"
+                            class="size-32 rounded-md bg-base-300 object-cover transition group-hover:ring-4 group-hover:ring-accent group-focus:ring-4 group-focus:ring-accent"
                         />
 
                         <div class="-space-y-1">
-                            <h2 class="text-lg font-bold">
-                                {display_name ?? username}
+                            <h2 class="text-lg font-bold text-accent">
+                                {displayName ?? username}
                             </h2>
                             <p class="text-sm">@{username}</p>
                         </div>
@@ -131,7 +138,7 @@
         {:else if layout === 'list'}
             <section class="flex w-full max-w-xl flex-col divide-y divide-base-300">
                 {#await getProfiles() then profiles}
-                    {#each profiles as { id, username, display_name, avatar } (id)}
+                    {#each profiles as { id, username, displayName: display_name, avatar } (id)}
                         <button
                             class="flex w-full cursor-pointer items-center gap-4 p-4 transition-colors hover:bg-base-200"
                         >
@@ -204,17 +211,14 @@
                 <span class="text-error">*</span> required fields
             </p>
 
-            {#if createProfileError}
-                <div class="rounded-md bg-error p-2 text-center text-error-content">
-                    <p>{createProfileError}</p>
-                </div>
-            {/if}
-
             <fieldset class="fieldset">
                 <legend class="fieldset-legend gap-1">
                     Username <span class="text-error">*</span>
                 </legend>
-                <label class="input w-full">
+                <label
+                    class="input w-full"
+                    class:input-error={createProfileError?.field === 'username'}
+                >
                     <iconify-icon icon="mdi:user"></iconify-icon>
                     <input type="text" class="grow" placeholder="c00lus3r" bind:value={username} />
                 </label>
@@ -223,7 +227,10 @@
 
             <fieldset class="fieldset">
                 <legend class="fieldset-legend">Display Name</legend>
-                <label class="input w-full">
+                <label
+                    class="input w-full"
+                    class:input-error={createProfileError?.field === 'display_name'}
+                >
                     <iconify-icon icon="mdi:account"></iconify-icon>
                     <input
                         type="text"
@@ -264,6 +271,8 @@
                             type="file"
                             accept="image/*"
                             class="file-input w-full"
+                            class:file-input-error={createProfileError?.field ===
+                                'profile_picture_bytes'}
                             onchange={handleFileChange}
                             bind:this={createProfileFileInput}
                         />
@@ -272,9 +281,39 @@
                 </div>
             </section>
 
-            <button type="submit" class="btn mt-8 w-full btn-primary">
-                <iconify-icon icon="mdi:account-plus" class="text-lg"></iconify-icon>
-                Create Profile
+            <div class="my-6 h-8">
+                <!-- Prevent layout shift -->
+
+                {#if createProfileError}
+                    <div
+                        class="relative -mx-6 flex h-full items-center justify-center gap-2 bg-error text-center text-error-content"
+                        transition:fade={{ duration: 200 }}
+                    >
+                        <iconify-icon icon="mdi:alert" class="inline-block"></iconify-icon>
+                        <p class="text-sm">
+                            {createProfileError.message} ({createProfileError.code})
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn absolute right-0 btn-square btn-sm btn-error"
+                            onclick={() => (createProfileError = undefined)}
+                            aria-label="Close"
+                        >
+                            <iconify-icon icon="mdi:close" class="text-lg"></iconify-icon>
+                        </button>
+                    </div>
+                {/if}
+            </div>
+
+            <button type="submit" class="btn w-full btn-primary" disabled={createProfileLoading}>
+                {#if createProfileLoading}
+                    <span class="loading loading-spinner"></span>
+                    Loading...
+                {:else}
+                    <iconify-icon icon="mdi:account-plus" class="text-lg"></iconify-icon>
+                    Create Profile
+                {/if}
             </button>
         </form>
     </div>
