@@ -109,4 +109,39 @@ impl ProfileRepository {
 
         Ok(())
     }
+
+    pub async fn update_profile(
+        &self,
+        profile_id: i32,
+        username: Option<String>,
+        display_name: Option<String>,
+        profile_picture_bytes: Option<Vec<u8>>,
+    ) -> Result<profile_model::ProfileModel, ErrorResponse> {
+        let profile_picture_url = if let Some(bytes) = profile_picture_bytes {
+            let path = profile_picture::save_profile_picture(&bytes)?;
+            Some(path.to_string_lossy().to_string())
+        } else {
+            None
+        };
+
+        let updated_profile = sqlx::query_as::<_, profile_model::ProfileModel>(
+            r#"
+            UPDATE profiles
+            SET
+                username = COALESCE($1, username),
+                display_name = COALESCE($2, display_name),
+                profile_picture_url = COALESCE($3, profile_picture_url)
+            WHERE id = $4 AND deleted_at IS NULL
+            RETURNING *
+            "#,
+        )
+        .bind(username)
+        .bind(display_name)
+        .bind(&profile_picture_url)
+        .bind(profile_id)
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(updated_profile)
+    }
 }

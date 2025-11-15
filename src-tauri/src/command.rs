@@ -1,5 +1,5 @@
 use crate::{
-    services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO},
+    services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO, UpdateProfileDTO},
     state::AppState,
     utils::error::mapping::ErrorResponse,
 };
@@ -35,10 +35,15 @@ pub async fn get_profile_by_username(
 }
 
 #[tauri::command]
-pub async fn delete_profile(
-    state: State<'_, AppState>,
-    id: i32,
-) -> Result<(), ErrorResponse> {
+pub async fn delete_profile(state: State<'_, AppState>, id: i32) -> Result<(), ErrorResponse> {
     state.profile_service.delete_profile(id).await
 }
 
+#[tauri::command]
+pub async fn update_profile(
+    state: State<'_, AppState>,
+    id: i32,
+    profile: UpdateProfileDTO,
+) -> Result<GetProfileDTO, ErrorResponse> {
+    state.profile_service.update_profile(id, profile).await
+}

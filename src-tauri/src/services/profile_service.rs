@@ -1,7 +1,7 @@
 use crate::{
     models::v1::profile_model::ProfileModel,
     repositories,
-    services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO},
+    services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO, UpdateProfileDTO},
     utils::error::mapping::{ErrorCode, ErrorResponse},
 };
 use validator::Validate;
@@ -82,5 +82,25 @@ impl ProfileService {
 
     pub async fn delete_profile(&self, id: i32) -> Result<(), ErrorResponse> {
         self.repo.delete_profile(id).await
+    }
+
+    pub async fn update_profile(
+        &self,
+        id: i32,
+        profile: UpdateProfileDTO,
+    ) -> Result<GetProfileDTO, ErrorResponse> {
+        let profile = self
+            .repo
+            .update_profile(
+                id,
+                profile.username,
+                profile.display_name,
+                profile.profile_picture_bytes,
+            )
+            .await?;
+
+        let dto = GetProfileDTO::try_from(profile).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
+
+        Ok(dto)
     }
 }
