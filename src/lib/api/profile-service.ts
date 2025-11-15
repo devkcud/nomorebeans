@@ -18,6 +18,7 @@ export async function createProfile(profile: CreateProfileRequest): Promise<Prof
             profile: {
                 username,
                 displayName: displayName?.trim() === '' ? undefined : displayName,
+                // @ts-ignore
                 profilePictureBytes: await profilePicture?.bytes()
             }
         });

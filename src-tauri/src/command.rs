@@ -33,3 +33,12 @@ pub async fn get_profile_by_username(
 ) -> Result<GetProfileDTO, ErrorResponse> {
     state.profile_service.get_one_by_username(username).await
 }
+
+#[tauri::command]
+pub async fn delete_profile(
+    state: State<'_, AppState>,
+    id: i32,
+) -> Result<(), ErrorResponse> {
+    state.profile_service.delete_profile(id).await
+}
+

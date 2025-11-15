@@ -79,4 +79,8 @@ impl ProfileService {
 
         Ok(dto)
     }
+
+    pub async fn delete_profile(&self, id: i32) -> Result<(), ErrorResponse> {
+        self.repo.delete_profile(id).await
+    }
 }

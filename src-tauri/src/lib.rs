@@ -28,6 +28,7 @@ pub fn run() {
                 command::create_profile,
                 command::get_profile_by_id,
                 command::get_profile_by_username,
+                command::delete_profile,
             ])
             .run(generate_context!())
             .expect("error while running tauri application");

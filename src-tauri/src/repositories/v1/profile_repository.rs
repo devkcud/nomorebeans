@@ -93,4 +93,20 @@ impl ProfileRepository {
 
         Ok(profile)
     }
+
+    pub async fn delete_profile(
+        &self,
+        profile_id: i32,
+    ) -> Result<(), ErrorResponse> {
+        sqlx::query(
+            r#"
+            UPDATE profiles SET deleted_at = NOW() WHERE id = $1
+            "#,
+        )
+        .bind(profile_id)
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
+    }
 }
