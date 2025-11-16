@@ -1,11 +1,16 @@
 <script lang="ts">
     import { getCurrentWindow } from '@tauri-apps/api/window';
+    import { goto } from '$app/navigation';
     import 'iconify-icon';
     import '../app.css';
 
     let { children } = $props();
 
     const window = getCurrentWindow();
+
+    function logout() {
+        goto('/');
+    }
 </script>
 
 <div
@@ -44,7 +49,11 @@
 </div>
 
 <header class="navbar fixed top-10">
-    <button class="group btn btn-square btn-sm" aria-label="logout">
+    <button
+        class="group btn btn-square btn-sm"
+        aria-label="change profile"
+        onclick={() => logout()}
+    >
         <iconify-icon icon="mdi:users" class="text-sm"></iconify-icon>
     </button>
 
