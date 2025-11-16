@@ -10,3 +10,9 @@ export type CreateProfileRequest = {
     displayName?: string;
     profilePicture?: File;
 };
+
+export type UpdateProfileRequest = {
+    username?: string;
+    displayName?: string;
+    profilePicture?: File;
+};
