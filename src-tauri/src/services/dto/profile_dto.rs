@@ -42,7 +42,33 @@ pub struct CreateProfileDTO {
     pub display_name: Option<String>,
 
     #[validate(custom(function = "validate_profile_picture_size"))]
-    #[serde(rename = "profilePictureBytes")]
+    pub profile_picture_bytes: Option<Vec<u8>>,
+}
+
+#[derive(Debug, Clone, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateProfileDTO {
+    #[validate(
+        length(
+            min = 3,
+            max = 16,
+            message = "Username must be between 3 and 16 characters"
+        ),
+        regex(
+            path = *USERNAME_REGEX,
+            message = "Username can only contain lowercase letters and numbers"
+        )
+    )]
+    pub username: Option<String>,
+
+    #[validate(length(
+        min = 1,
+        max = 32,
+        message = "Display name must be between 1 and 32 characters"
+    ))]
+    pub display_name: Option<String>,
+
+    #[validate(custom(function = "validate_profile_picture_size"))]
     pub profile_picture_bytes: Option<Vec<u8>>,
 }
 

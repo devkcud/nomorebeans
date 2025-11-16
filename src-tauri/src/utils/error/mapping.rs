@@ -63,7 +63,8 @@ macro_rules! error_codes {
 }
 
 error_codes! {
-    UserInputValidationError = Validation Client 01;
+    UserInputValidationError  = Validation Client 01;
+    SearchObjectNotFoundError = Validation Client 02;
 
     ExpectedError = Service Server 01; // Used for known, server, unhandled errors. Example: database errors, IO errors, etc.
     DatabaseError = Service Server 02;
