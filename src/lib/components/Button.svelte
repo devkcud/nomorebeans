@@ -12,12 +12,14 @@
         color?:
             | 'primary'
             | 'secondary'
+            | 'accent'
             | 'success'
             | 'warning'
             | 'error'
             | 'info'
             | 'neutral'
-            | 'ghost';
+            | 'ghost'
+            | 'glass';
         icon?: string;
         tooltip?: string;
         tooltipOrientation?: 'top' | 'bottom' | 'left' | 'right';
@@ -66,12 +68,14 @@
     const colorClass = {
         primary: 'btn-primary',
         secondary: 'btn-secondary',
+        accent: 'btn-accent',
         success: 'btn-success',
         warning: 'btn-warning',
         error: 'btn-error',
         info: 'btn-info',
         neutral: 'btn-neutral',
-        ghost: 'btn-ghost'
+        ghost: 'btn-ghost',
+        glass: 'glass-effect text-base-content'
     };
 
     const tooltipOrientationClass = {
@@ -96,12 +100,15 @@
         {isSoft ? 'btn-soft' : ''}
         {tooltip ? 'tooltip' : ''}
         {tooltip && tooltipOrientation ? tooltipOrientationClass[tooltipOrientation] : ''}
+        transition-smooth
+        hover:scale-105
+        active:scale-95
     "
     {onclick}
     data-tip={tooltip}
 >
     {#if icon}
-        <iconify-icon {icon}></iconify-icon>
+        <iconify-icon {icon} class="transition-smooth"></iconify-icon>
     {/if}
 
     {#if children}

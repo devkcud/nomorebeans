@@ -5,6 +5,7 @@
     import 'iconify-icon';
     import '../app.css';
     import Button from '$lib/components/Button.svelte';
+    import Title from '$lib/components/Title.svelte';
 
     let { children } = $props();
 
@@ -24,14 +25,18 @@
 </script>
 
 <header
-    class="fixed top-0 right-0 left-0 z-50 grid h-10 grid-cols-3 items-center gap-2 bg-base-200 px-4 select-none"
+    class="fixed top-0 right-0 left-0 z-50 grid h-10 grid-cols-3 items-center gap-2 px-4 select-none"
     data-tauri-drag-region
 >
-    <h1>{#await window.title() then title}{title}{/await}</h1>
+    <Title size="sm" colored bold>
+        {#await window.title() then title}
+            {title}
+        {/await}
+    </Title>
 
     <div data-tauri-drag-region></div>
 
-    <section class="justify-self-end" data-tauri-drag-region>
+    <section class="flex gap-1 justify-self-end" data-tauri-drag-region>
         <Button
             icon="mdi:window-minimize"
             size="xs"
@@ -56,7 +61,7 @@
     </section>
 </header>
 
-<nav class="navbar fixed top-8">
+<nav class="navbar fixed top-8 z-40 rounded-2xl">
     <section class="flex items-center gap-2">
         <Button icon="mdi:users" size="sm" layout="square" onclick={logout} />
 
@@ -79,13 +84,6 @@
     </section>
 
     <div class="grow"></div>
-
-    <label class="btn swap btn-square swap-rotate btn-sm">
-        <input type="checkbox" class="theme-controller hidden" value="light" />
-
-        <iconify-icon icon="bxs:sun" class="swap-off"></iconify-icon>
-        <iconify-icon icon="bxs:moon" class="swap-on"></iconify-icon>
-    </label>
 </nav>
 
 <div class="h-screen overflow-auto pt-10">
