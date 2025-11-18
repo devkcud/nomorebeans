@@ -26,6 +26,7 @@
 
         isJoinItem?: boolean;
         isSoft?: boolean;
+        disabled?: boolean;
 
         onclick?: () => void;
     }
@@ -42,6 +43,7 @@
         tooltipOrientation = 'top',
         isJoinItem,
         isSoft,
+        disabled = false,
         onclick
     }: Props = $props();
 
@@ -106,6 +108,7 @@
     "
     {onclick}
     data-tip={tooltip}
+    {disabled}
 >
     {#if icon}
         <iconify-icon {icon} class="transition-smooth"></iconify-icon>
