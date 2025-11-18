@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { getProfiles } from '$lib/api/profile-service';
     import type { ErrorResponse } from '$lib/api/types/error';
     import type { GetProfileResponse } from '$lib/api/types/profile';
@@ -34,6 +35,10 @@
 
     function handleProfileCreated() {
         loadProfiles();
+    }
+
+    function goToManageUsers() {
+        goto('/manage-users');
     }
 
     $effect(() => {
@@ -132,7 +137,7 @@
 
         <article class="mt-16 flex gap-2">
             <Button icon="mdi:cog" color="ghost">Settings</Button>
-            <Button icon="mdi:account-cog" color="ghost">Manage Users</Button>
+            <Button icon="mdi:account-cog" color="ghost" onclick={goToManageUsers}>Manage Profiles</Button>
             <Button icon="mdi:dollar" color="primary">EzPay</Button>
         </article>
     </main>
