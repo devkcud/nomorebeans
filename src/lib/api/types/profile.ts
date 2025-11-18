@@ -1,4 +1,4 @@
-export type Profile = {
+export type GetProfileResponse = {
     id: number;
     username: string;
     displayName?: string;
@@ -7,6 +7,12 @@ export type Profile = {
 
 export type CreateProfileRequest = {
     username: string;
+    displayName?: string;
+    profilePicture?: File;
+};
+
+export type UpdateProfileRequest = {
+    username?: string;
     displayName?: string;
     profilePicture?: File;
 };

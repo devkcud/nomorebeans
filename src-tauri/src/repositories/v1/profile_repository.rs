@@ -50,10 +50,98 @@ impl ProfileRepository {
         Ok(created_profile)
     }
 
-    pub async fn get_profiles(&self) -> Result<Vec<profile_model::ProfileModel>, ErrorResponse> {
-        let profiles = sqlx::query_as::<_, profile_model::ProfileModel>("SELECT * FROM profiles")
-            .fetch_all(&self.pool)
-            .await?;
+    pub async fn get_all(&self) -> Result<Vec<profile_model::ProfileModel>, ErrorResponse> {
+        let profiles = sqlx::query_as::<_, profile_model::ProfileModel>(
+            r#"
+            SELECT * FROM profiles WHERE deleted_at IS NULL
+            "#,
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
         Ok(profiles)
+    }
+
+    pub async fn get_one_by_id(
+        &self,
+        profile_id: i32,
+    ) -> Result<Option<profile_model::ProfileModel>, ErrorResponse> {
+        let profile = sqlx::query_as::<_, profile_model::ProfileModel>(
+            r#"
+            SELECT * FROM profiles WHERE id = $1 AND deleted_at IS NULL
+            "#,
+        )
+        .bind(profile_id)
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(profile)
+    }
+
+    pub async fn get_one_by_username(
+        &self,
+        profile_username: String,
+    ) -> Result<Option<profile_model::ProfileModel>, ErrorResponse> {
+        let profile = sqlx::query_as::<_, profile_model::ProfileModel>(
+            r#"
+            SELECT * FROM profiles WHERE username = $1 AND deleted_at IS NULL
+            "#,
+        )
+        .bind(profile_username)
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(profile)
+    }
+
+    pub async fn delete_profile(&self, profile_id: i32) -> Result<(), ErrorResponse> {
+        sqlx::query(
+            r#"
+            UPDATE profiles
+            SET deleted_at = NOW(),
+                username = CONCAT('deleted:', id)
+            WHERE id = $1 AND deleted_at IS NULL;
+            "#,
+        )
+        .bind(profile_id)
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn update_profile(
+        &self,
+        profile_id: i32,
+        username: Option<String>,
+        display_name: Option<String>,
+        profile_picture_bytes: Option<Vec<u8>>,
+    ) -> Result<profile_model::ProfileModel, ErrorResponse> {
+        let profile_picture_url = if let Some(bytes) = profile_picture_bytes {
+            let path = profile_picture::save_profile_picture(&bytes)?;
+            Some(path.to_string_lossy().to_string())
+        } else {
+            None
+        };
+
+        let updated_profile = sqlx::query_as::<_, profile_model::ProfileModel>(
+            r#"
+            UPDATE profiles
+            SET
+                username = COALESCE($1, username),
+                display_name = COALESCE($2, display_name),
+                profile_picture_url = COALESCE($3, profile_picture_url)
+            WHERE id = $4 AND deleted_at IS NULL
+            RETURNING *
+            "#,
+        )
+        .bind(username)
+        .bind(display_name)
+        .bind(&profile_picture_url)
+        .bind(profile_id)
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(updated_profile)
     }
 }
