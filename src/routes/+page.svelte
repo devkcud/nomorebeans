@@ -2,12 +2,12 @@
     import { getProfiles } from '$lib/api/profile-service';
     import type { ErrorResponse } from '$lib/api/types/error';
     import type { GetProfileResponse } from '$lib/api/types/profile';
-    import type { ProfileSelectionLayoutMode } from '$lib/api/types/settings';
+    import { toggleLayoutMode, type ProfileSelectionLayoutMode } from '$lib/api/types/settings';
     import ProfileCard from '$lib/components/ProfileCard.svelte';
     import CreateProfileModal from '$lib/components/CreateProfileModal.svelte';
     import Button from '$lib/components/Button.svelte';
 
-    let createProfileModal: CreateProfileModal;
+    let createProfileModal = $state<CreateProfileModal>();
 
     let layout = $state<ProfileSelectionLayoutMode>('grid');
     let profiles = $state<GetProfileResponse[]>([]);
@@ -28,7 +28,7 @@
     }
 
     function toggleLayout() {
-        layout = layout === 'grid' ? 'list' : 'grid';
+        layout = toggleLayoutMode(layout);
     }
 
     function handleProfileCreated() {
