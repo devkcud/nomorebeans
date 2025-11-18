@@ -106,13 +106,14 @@
             </section>
         {:else}
             <section class="mb-6 flex w-full max-w-xl flex-col divide-y divide-neutral">
-                {#each profiles as profile (profile.id)}
-                    <ProfileCard {profile} variant="list" />
-                {/each}
+                <div>
+                    {#each profiles as profile (profile.id)}
+                        <ProfileCard {profile} variant="list" />
+                    {/each}
+                </div>
 
                 <button
                     class="group transition-smooth glass-effect relative flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl p-4 text-center hover:scale-105 hover:bg-linear-to-br hover:from-primary/10 hover:to-secondary/10"
-                    aria-label="Add Profile"
                     onclick={() => createProfileModal!.open()}
                 >
                     <div

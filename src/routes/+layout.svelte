@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getVersion } from '@tauri-apps/api/app';
     import { getCurrentWindow } from '@tauri-apps/api/window';
     import { goto } from '$app/navigation';
     import { browser } from '$app/environment';
@@ -89,3 +90,9 @@
 <div class="h-screen overflow-auto pt-10">
     {@render children()}
 </div>
+
+<p class="fixed bottom-2 right-4 text-xs opacity-30 select-none">
+    {#await getVersion() then version}
+        v{version}
+    {/await}
+</p>
