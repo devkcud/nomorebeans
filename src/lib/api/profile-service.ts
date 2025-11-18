@@ -1,5 +1,9 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { CreateProfileRequest, GetProfileResponse, UpdateProfileRequest } from '../api/types/profile';
+import type {
+    CreateProfileRequest,
+    GetProfileResponse,
+    UpdateProfileRequest
+} from '../api/types/profile';
 import { AVATAR_DATA_URI_PREFIX } from '$lib/constants';
 import { fileToBytes } from '$lib/utils';
 
@@ -29,7 +33,10 @@ export async function createProfile(profile: CreateProfileRequest): Promise<GetP
     return transformProfileAvatar(result);
 }
 
-export async function updateProfile(id: number, profile: UpdateProfileRequest): Promise<GetProfileResponse> {
+export async function updateProfile(
+    id: number,
+    profile: UpdateProfileRequest
+): Promise<GetProfileResponse> {
     const { username, displayName, profilePicture } = profile;
 
     const result = await invoke<GetProfileResponse>('update_profile', {
