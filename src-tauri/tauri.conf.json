@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "nomorebeans",
+        "title": "NoMoreBeans",
         "width": 1280,
         "height": 968,
         "decorations": false

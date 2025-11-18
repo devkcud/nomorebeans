@@ -1,4 +1,4 @@
-export type Profile = {
+export type GetProfileResponse = {
     id: number;
     username: string;
     displayName?: string;
