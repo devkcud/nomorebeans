@@ -1,12 +1,13 @@
+use chrono::NaiveDateTime;
 use sqlx::FromRow;
 
 #[derive(FromRow, Debug)]
 pub struct ProfileModel {
     pub id: i32,
 
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
-    pub deleted_at: Option<chrono::NaiveDateTime>,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+    pub deleted_at: Option<NaiveDateTime>,
 
     pub username: String,
     pub display_name: Option<String>,
