@@ -7,7 +7,7 @@ use sqlx::{FromRow, Type};
 pub enum JobType {
     CLT,
     PJ,
-    Freelance,
+    Freelancer,
 }
 
 impl JobType {
@@ -15,7 +15,7 @@ impl JobType {
         match self {
             JobType::CLT => "clt",
             JobType::PJ => "pj",
-            JobType::Freelance => "freelance",
+            JobType::Freelancer => "freelancer",
         }
     }
 
@@ -23,16 +23,16 @@ impl JobType {
         match s.to_lowercase().as_str() {
             "clt" => Ok(JobType::CLT),
             "pj" => Ok(JobType::PJ),
-            "freelance" => Ok(JobType::Freelance),
+            "freelancer" => Ok(JobType::Freelancer),
             _ => Err(format!(
-                "Invalid job type: '{}'. Must be one of: clt, pj, freelance",
+                "Invalid job type: '{}'. Must be one of: clt, pj, freelancer",
                 s
             )),
         }
     }
 
     pub fn all_values() -> &'static [&'static str] {
-        &["clt", "pj", "freelance"]
+        &["clt", "pj", "freelancer"]
     }
 }
 

@@ -143,7 +143,7 @@ fn validate_job_type(job_type: &str) -> Result<(), ValidationError> {
         Ok(())
     } else {
         Err(ValidationError::new(
-            "Invalid job type. Must be one of: clt, pj, freelance",
+            "Invalid job type. Must be one of: clt, pj, freelancer",
         ))
     }
 }
