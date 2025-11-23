@@ -49,7 +49,7 @@ pub struct CreateJobDTO {
     #[validate(range(
         min = WORKDAYS_PER_MONTH_MIN,
         max = WORKDAYS_PER_MONTH_MAX,
-        message = "Workdays per month must be between 1 and 31"
+        message = "Workdays per month must be between 1 and 30"
     ))]
     pub workdays_per_month: i32,
 }
@@ -82,7 +82,7 @@ pub struct UpdateJobDTO {
     #[validate(range(
         min = WORKDAYS_PER_MONTH_MIN,
         max = WORKDAYS_PER_MONTH_MAX,
-        message = "Workdays per month must be between 1 and 31"
+        message = "Workdays per month must be between 1 and 30"
     ))]
     pub workdays_per_month: Option<i32>,
 }
