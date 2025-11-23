@@ -5,12 +5,14 @@ import type {
     UpdateProfileRequest
 } from '../api/types/profile';
 import { AVATAR_DATA_URI_PREFIX } from '$lib/constants';
-import { fileToBytes } from '$lib/utils';
+import { fileToBytes, getPlaceholderAvatarUrl } from '$lib/utils';
 
 function transformProfileAvatar(profile: GetProfileResponse): GetProfileResponse {
     return {
         ...profile,
-        avatar: profile.avatar ? `${AVATAR_DATA_URI_PREFIX}${profile.avatar}` : undefined
+        avatar: profile.avatar
+            ? `${AVATAR_DATA_URI_PREFIX}${profile.avatar}`
+            : getPlaceholderAvatarUrl(profile.username)
     };
 }
 

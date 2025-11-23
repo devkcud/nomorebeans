@@ -2,7 +2,7 @@ export type GetProfileResponse = {
     id: number;
     username: string;
     displayName?: string;
-    avatar?: string;
+    avatar: string;
 };
 
 export type CreateProfileRequest = {

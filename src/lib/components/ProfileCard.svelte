@@ -1,7 +1,6 @@
 <script lang="ts">
     import type { GetProfileResponse } from '$lib/api/types/profile';
     import type { ProfileSelectionLayoutMode } from '$lib/api/types/settings';
-    import { getAvatarUrl } from '$lib/utils';
     import Title from './Title.svelte';
 
     interface Props {
@@ -20,7 +19,7 @@
     >
         <div class="relative">
             <img
-                src={getAvatarUrl(profile.avatar, profile.username)}
+                src={profile.avatar}
                 alt={profile.username}
                 class="transition-smooth size-32 rounded-2xl bg-base-300 object-cover ring-2 ring-primary/20 group-hover:scale-105 group-hover:ring-primary/60 group-focus:scale-105"
             />
@@ -45,7 +44,7 @@
     >
         <div class="relative">
             <img
-                src={getAvatarUrl(profile.avatar, profile.username)}
+                src={profile.avatar}
                 alt={profile.username}
                 class="transition-smooth size-16 rounded-xl bg-base-300 object-cover ring-2 ring-primary/20 group-hover:scale-105 group-hover:ring-primary/60"
             />

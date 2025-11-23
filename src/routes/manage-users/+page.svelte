@@ -162,8 +162,7 @@
                                         <div class="avatar">
                                             <div class="size-12 rounded-full ring-2 ring-primary/30">
                                                 <img
-                                                    src={profile.avatar ||
-                                                        getPlaceholderAvatarUrl(profile.username)}
+                                                    src={profile.avatar}
                                                     alt="{profile.username}'s avatar"
                                                 />
                                             </div>

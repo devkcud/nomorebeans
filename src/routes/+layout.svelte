@@ -6,12 +6,14 @@
     import '../app.css';
     import Button from '$lib/components/Button.svelte';
     import Title from '$lib/components/Title.svelte';
+    import { authStore } from '$lib/stores/auth.svelte';
 
     let { children } = $props();
 
     const window = getCurrentWindow();
 
     function logout() {
+        authStore.logout();
         goto('/');
     }
 </script>

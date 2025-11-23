@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { onMount } from 'svelte';
     import { getProfiles } from '$lib/api/profile-service';
     import type { ErrorResponse } from '$lib/api/types/error';
     import type { GetProfileResponse } from '$lib/api/types/profile';
@@ -8,6 +9,7 @@
     import CreateProfileModal from '$lib/components/CreateProfileModal.svelte';
     import Button from '$lib/components/Button.svelte';
     import Title from '$lib/components/Title.svelte';
+    import { authStore } from '$lib/stores/auth.svelte';
 
     let createProfileModal = $state<CreateProfileModal>();
 
@@ -40,6 +42,17 @@
     function goToManageUsers() {
         goto('/manage-users');
     }
+
+    function handleProfileSelect(profile: GetProfileResponse) {
+        authStore.login(profile);
+        goto('/dashboard');
+    }
+
+    onMount(() => {
+        if (authStore.isLoggedIn) {
+            goto('/dashboard');
+        }
+    });
 
     $effect(() => {
         loadProfiles();
@@ -87,7 +100,7 @@
         {:else if layout === 'grid'}
             <section class="flex max-w-5xl flex-wrap justify-center gap-6 *:shrink-0">
                 {#each profiles as profile (profile.id)}
-                    <ProfileCard {profile} variant="grid" />
+                    <ProfileCard {profile} variant="grid" onclick={() => handleProfileSelect(profile)} />
                 {/each}
 
                 <button
@@ -113,7 +126,7 @@
             <section class="mb-6 flex w-full max-w-xl flex-col divide-y divide-neutral">
                 <div>
                     {#each profiles as profile (profile.id)}
-                        <ProfileCard {profile} variant="list" />
+                        <ProfileCard {profile} variant="list" onclick={() => handleProfileSelect(profile)} />
                     {/each}
                 </div>
 
