@@ -1,5 +1,4 @@
 use crate::{
-    models::v1::job_model::JobModel,
     repositories::v1::job_repository,
     services::dto::job_dto::{CreateJobDTO, GetJobDTO, UpdateJobDTO},
     utils::error::mapping::ErrorResponse,
@@ -27,13 +26,13 @@ impl JobService {
             .repo
             .create(
                 profile_id,
-                &new_job.try_into().map_err(|_| ErrorResponse::unhandled())?,
+                &new_job
+                    .try_into()
+                    .map_err(|e: String| ErrorResponse::validation_error("job_type", &e))?,
             )
             .await?;
 
-        let dto = map_job(job)?;
-
-        Ok(dto)
+        Ok(GetJobDTO::from(job))
     }
 
     pub async fn fetch_all_for_profile(
@@ -41,11 +40,7 @@ impl JobService {
         profile_id: i32,
     ) -> Result<Vec<GetJobDTO>, ErrorResponse> {
         let jobs = self.repo.fetch_all_for_profile(profile_id).await?;
-        let dtos = jobs
-            .into_iter()
-            .map(GetJobDTO::try_from)
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(|_| ErrorResponse::unhandled())?;
+        let dtos = jobs.into_iter().map(GetJobDTO::from).collect();
 
         Ok(dtos)
     }
@@ -57,13 +52,8 @@ impl JobService {
     ) -> Result<GetJobDTO, ErrorResponse> {
         let job = self.repo.fetch_by_id(profile_id, job_id).await?;
 
-        job.map(map_job)
-            .transpose()?
+        job.map(GetJobDTO::from)
             .ok_or(ErrorResponse::object_not_found("id", "Job not found"))
-    }
-
-    pub async fn delete(&self, profile_id: i32, job_id: i32) -> Result<(), ErrorResponse> {
-        self.repo.delete(profile_id, job_id).await
     }
 
     pub async fn update(
@@ -81,16 +71,14 @@ impl JobService {
                 job_id,
                 updated_job
                     .try_into()
-                    .map_err(|_| ErrorResponse::unhandled())?,
+                    .map_err(|e: String| ErrorResponse::validation_error("job_type", &e))?,
             )
             .await?;
 
-        let dto = map_job(job)?;
-
-        Ok(dto)
+        Ok(GetJobDTO::from(job))
     }
-}
 
-fn map_job(model: JobModel) -> Result<GetJobDTO, ErrorResponse> {
-    GetJobDTO::try_from(model).map_err(|_| ErrorResponse::unhandled())
+    pub async fn delete(&self, profile_id: i32, job_id: i32) -> Result<(), ErrorResponse> {
+        self.repo.delete(profile_id, job_id).await
+    }
 }

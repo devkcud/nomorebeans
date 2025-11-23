@@ -14,7 +14,7 @@ impl JobRepository {
     pub async fn create(
         &self,
         profile_id: i32,
-        new_job: &job_model::NewJobModel,
+        new_job: &job_model::CreateJobModel,
     ) -> Result<job_model::JobModel, ErrorResponse> {
         let created_job = sqlx::query_as::<_, job_model::JobModel>(
             r#"
@@ -77,7 +77,7 @@ impl JobRepository {
         &self,
         profile_id: i32,
         job_id: i32,
-        updated_job: job_model::UpdateJobModel,
+        updates: job_model::UpdateJobModel,
     ) -> Result<job_model::JobModel, ErrorResponse> {
         let updated_job = sqlx::query_as::<_, job_model::JobModel>(
             r#"
@@ -93,12 +93,12 @@ impl JobRepository {
             RETURNING *
             "#,
         )
-        .bind(&updated_job.company_name)
-        .bind(&updated_job.position_title)
-        .bind(updated_job.salary_gross)
-        .bind(&updated_job.job_type)
-        .bind(updated_job.daily_work_hours)
-        .bind(updated_job.workdays_per_month)
+        .bind(&updates.company_name)
+        .bind(&updates.position_title)
+        .bind(updates.salary_gross)
+        .bind(&updates.job_type)
+        .bind(updates.daily_work_hours)
+        .bind(updates.workdays_per_month)
         .bind(job_id)
         .bind(profile_id)
         .fetch_one(&self.pool)

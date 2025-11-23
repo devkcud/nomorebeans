@@ -93,22 +93,6 @@ impl ProfileRepository {
         Ok(profile)
     }
 
-    pub async fn delete(&self, profile_id: i32) -> Result<(), ErrorResponse> {
-        sqlx::query(
-            r#"
-            UPDATE profiles
-            SET deleted_at = NOW(),
-                username = CONCAT('deleted:', id)
-            WHERE id = $1 AND deleted_at IS NULL;
-            "#,
-        )
-        .bind(profile_id)
-        .execute(&self.pool)
-        .await?;
-
-        Ok(())
-    }
-
     pub async fn update(
         &self,
         profile_id: i32,
@@ -142,5 +126,21 @@ impl ProfileRepository {
         .await?;
 
         Ok(updated_profile)
+    }
+
+    pub async fn delete(&self, profile_id: i32) -> Result<(), ErrorResponse> {
+        sqlx::query(
+            r#"
+            UPDATE profiles
+            SET deleted_at = NOW(),
+                username = CONCAT('deleted:', id)
+            WHERE id = $1 AND deleted_at IS NULL;
+            "#,
+        )
+        .bind(profile_id)
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
     }
 }

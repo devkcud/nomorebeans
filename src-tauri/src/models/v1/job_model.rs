@@ -10,6 +10,32 @@ pub enum JobType {
     Freelance,
 }
 
+impl JobType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            JobType::CLT => "clt",
+            JobType::PJ => "pj",
+            JobType::Freelance => "freelance",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Result<Self, String> {
+        match s.to_lowercase().as_str() {
+            "clt" => Ok(JobType::CLT),
+            "pj" => Ok(JobType::PJ),
+            "freelance" => Ok(JobType::Freelance),
+            _ => Err(format!(
+                "Invalid job type: '{}'. Must be one of: clt, pj, freelance",
+                s
+            )),
+        }
+    }
+
+    pub fn all_values() -> &'static [&'static str] {
+        &["clt", "pj", "freelance"]
+    }
+}
+
 #[derive(FromRow, Debug)]
 pub struct JobModel {
     pub id: i32,
@@ -31,14 +57,13 @@ pub struct JobModel {
 }
 
 #[derive(Debug)]
-pub struct NewJobModel {
+pub struct CreateJobModel {
     pub company_name: String,
     pub position_title: String,
     pub salary_gross: Decimal,
     pub job_type: JobType,
     pub daily_work_hours: i32,
     pub workdays_per_month: i32,
-    pub profile_owner_id: i32,
 }
 
 #[derive(Debug)]

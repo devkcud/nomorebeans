@@ -52,6 +52,10 @@ macro_rules! error_codes {
 
                             let cc: u32 = $cc;
                             debug_assert!(cc > 0 && cc < 100);
+                            debug_assert!(
+                                !(cc == 0 && !matches!(code, ErrorCode::PlaceholderError)),
+                                "CC=00 is reserved for PlaceholderError only"
+                            );
 
                             a * 1000 + b * 100 + cc
                         }
@@ -66,8 +70,8 @@ error_codes! {
     UserInputValidationError  = Validation Client 01;
     SearchObjectNotFoundError = Validation Client 02;
 
-    ExpectedError = Service Server 01; // Used for known, server, unhandled errors. Example: database errors, IO errors, etc.
-    DatabaseError = Service Server 02;
+    KnownInternalError = Service Server 01; // Used for known, server, unhandled errors. Example: database errors, IO errors, etc.
+    DatabaseError      = Service Server 02;
 
     ResourceError = Service Client 01; // Not tied to user input. Example: resource not found, etc.
 

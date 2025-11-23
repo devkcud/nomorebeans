@@ -3,8 +3,22 @@ use crate::utils::{
     error::mapping::{ErrorCode, ErrorResponse},
 };
 
+impl ErrorCode {
+    pub fn raise(self, field: impl Into<String>, message: impl Into<String>) -> ErrorResponse {
+        ErrorResponse::new(self, Some(field.into()), message)
+    }
+
+    pub fn msg_only(self, message: impl Into<String>) -> ErrorResponse {
+        ErrorResponse::new(self, None, message)
+    }
+}
+
 impl ErrorResponse {
     pub fn new(code: ErrorCode, field: Option<String>, message: impl Into<String>) -> Self {
+        if let ErrorCode::PlaceholderError = code {
+            panic!("PlaceholderError must not be used in real errors");
+        }
+
         Self {
             code_name: code,
             code: code.into(),
@@ -13,20 +27,20 @@ impl ErrorResponse {
         }
     }
 
-    pub fn expected() -> Self {
-        Self::new(ErrorCode::ExpectedError, None, "Expected error")
+    pub fn known_internal() -> Self {
+        ErrorCode::KnownInternalError.msg_only("Expected error")
     }
 
     pub fn unhandled() -> Self {
-        Self::new(ErrorCode::UnhandledError, None, "Unhandled error")
+        ErrorCode::UnhandledError.msg_only("Unhandled error")
     }
 
     pub fn object_not_found(field: impl Into<String>, message: impl Into<String>) -> Self {
-        Self::new(
-            ErrorCode::SearchObjectNotFoundError,
-            Some(field.into()),
-            message.into(),
-        )
+        ErrorCode::SearchObjectNotFoundError.raise(field, message)
+    }
+
+    pub fn validation_error(field: impl Into<String>, message: impl Into<String>) -> Self {
+        ErrorCode::UserInputValidationError.raise(field, message)
     }
 
     pub fn with_field(mut self, field: impl Into<String>) -> Self {
@@ -44,20 +58,26 @@ impl From<sqlx::Error> for ErrorResponse {
     fn from(err: sqlx::Error) -> Self {
         match err {
             sqlx::Error::Database(db_err) => {
-                if let Some(code) = db_err.code() {
-                    if let Some(msg) = db::pg_violation(code.as_ref()) {
-                        let field = db_err
-                            .constraint()
-                            .and_then(|c| db::extract_field_from_constraint(c));
+                let code = match db_err.code() {
+                    Some(c) => c,
+                    None => return ErrorCode::DatabaseError.msg_only("Database error"),
+                };
 
-                        return ErrorResponse::new(ErrorCode::UserInputValidationError, field, msg);
-                    }
+                let msg = match db::pg_violation(code.as_ref()) {
+                    Some(m) => m,
+                    None => return ErrorCode::DatabaseError.msg_only("Database error"),
+                };
+
+                let field = db_err
+                    .constraint()
+                    .and_then(|c| db::extract_field_from_constraint(c));
+
+                match field {
+                    Some(f) => ErrorCode::UserInputValidationError.raise(f, msg),
+                    None => ErrorCode::UserInputValidationError.msg_only(msg),
                 }
-                ErrorResponse::new(ErrorCode::DatabaseError, None, "Database error")
             }
-            sqlx::Error::RowNotFound => {
-                ErrorResponse::new(ErrorCode::ResourceError, None, "Resource not found")
-            }
+            sqlx::Error::RowNotFound => ErrorCode::ResourceError.msg_only("Resource not found"),
             _ => ErrorResponse::unhandled(),
         }
     }
@@ -78,7 +98,7 @@ impl From<std::io::Error> for ErrorResponse {
             _ => ("I/O error occurred", ErrorCode::IOError),
         };
 
-        ErrorResponse::new(error_code, None, msg)
+        error_code.msg_only(msg)
     }
 }
 
@@ -95,9 +115,9 @@ impl From<validator::ValidationErrors> for ErrorResponse {
         });
 
         if let Some((field, msg)) = field_detail {
-            ErrorResponse::new(ErrorCode::UserInputValidationError, Some(field), msg)
+            ErrorCode::UserInputValidationError.raise(field, msg)
         } else {
-            ErrorResponse::new(ErrorCode::ExpectedError, None, "Validation error occurred")
+            ErrorCode::UserInputValidationError.msg_only("Validation error occurred")
         }
     }
 }

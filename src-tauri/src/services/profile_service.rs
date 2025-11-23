@@ -1,30 +1,35 @@
 use crate::{
     models::v1::profile_model::ProfileModel,
-    repositories,
+    repositories::v1::profile_repository,
     services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO, UpdateProfileDTO},
     utils::error::mapping::ErrorResponse,
 };
+use base64::{engine::general_purpose, Engine as _};
+use std::fs;
 use validator::Validate;
 
 #[derive(Clone)]
 pub struct ProfileService {
-    repo: repositories::v1::profile_repository::ProfileRepository,
+    repo: profile_repository::ProfileRepository,
 }
 
 impl ProfileService {
-    pub fn new(repo: repositories::v1::profile_repository::ProfileRepository) -> Self {
+    pub fn new(repo: profile_repository::ProfileRepository) -> Self {
         Self { repo }
     }
 
-    pub async fn create(&self, profile: CreateProfileDTO) -> Result<GetProfileDTO, ErrorResponse> {
-        profile.validate()?;
+    pub async fn create(
+        &self,
+        new_profile: CreateProfileDTO,
+    ) -> Result<GetProfileDTO, ErrorResponse> {
+        new_profile.validate()?;
 
         let profile = self
             .repo
             .create(
-                profile.username,
-                profile.display_name,
-                profile.profile_picture_bytes,
+                new_profile.username,
+                new_profile.display_name,
+                new_profile.profile_picture_bytes,
             )
             .await?;
 
@@ -35,9 +40,15 @@ impl ProfileService {
 
     pub async fn fetch_all(&self) -> Result<Vec<GetProfileDTO>, ErrorResponse> {
         let users: Vec<ProfileModel> = self.repo.fetch_all().await?;
-        let dtos: Result<Vec<_>, _> = users.into_iter().map(GetProfileDTO::try_from).collect();
+        let dtos: Vec<GetProfileDTO> = users
+            .into_iter()
+            .map(|model| {
+                let avatar = load_avatar(&model.profile_picture_url);
+                GetProfileDTO::from(model).with_avatar(avatar)
+            })
+            .collect();
 
-        dtos.map_err(|_| ErrorResponse::unhandled())
+        Ok(dtos)
     }
 
     pub async fn fetch_by_id(&self, id: i32) -> Result<GetProfileDTO, ErrorResponse> {
@@ -64,24 +75,20 @@ impl ProfileService {
             ))
     }
 
-    pub async fn delete(&self, id: i32) -> Result<(), ErrorResponse> {
-        self.repo.delete(id).await
-    }
-
     pub async fn update(
         &self,
         id: i32,
-        profile: UpdateProfileDTO,
+        updates: UpdateProfileDTO,
     ) -> Result<GetProfileDTO, ErrorResponse> {
-        profile.validate()?;
+        updates.validate()?;
 
         let profile = self
             .repo
             .update(
                 id,
-                profile.username,
-                profile.display_name,
-                profile.profile_picture_bytes,
+                updates.username,
+                updates.display_name,
+                updates.profile_picture_bytes,
             )
             .await?;
 
@@ -89,8 +96,21 @@ impl ProfileService {
 
         Ok(dto)
     }
+
+    pub async fn delete(&self, id: i32) -> Result<(), ErrorResponse> {
+        self.repo.delete(id).await
+    }
 }
 
 fn map_profile(model: ProfileModel) -> Result<GetProfileDTO, ErrorResponse> {
-    GetProfileDTO::try_from(model).map_err(|_| ErrorResponse::unhandled())
+    let avatar = load_avatar(&model.profile_picture_url);
+    Ok(GetProfileDTO::from(model).with_avatar(avatar))
+}
+
+fn load_avatar(path: &Option<String>) -> Option<String> {
+    path.as_ref().and_then(|p| {
+        fs::read(p)
+            .ok()
+            .map(|bytes| general_purpose::STANDARD.encode(&bytes))
+    })
 }

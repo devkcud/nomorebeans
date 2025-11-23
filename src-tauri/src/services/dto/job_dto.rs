@@ -1,8 +1,10 @@
+use crate::{
+    models::v1::job_model::{CreateJobModel, JobModel, JobType, UpdateJobModel},
+    utils::validation::*,
+};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::{Validate, ValidationError};
-
-use crate::models::v1::job_model::{self, JobModel, NewJobModel, UpdateJobModel};
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -23,14 +25,14 @@ pub struct GetJobDTO {
 #[serde(rename_all = "camelCase")]
 pub struct CreateJobDTO {
     #[validate(length(
-        min = 1,
-        max = 64,
+        min = COMPANY_NAME_MIN_LENGTH,
+        max = COMPANY_NAME_MAX_LENGTH,
         message = "Company name must be between 1 and 64 characters"
     ))]
     pub company_name: String,
     #[validate(length(
-        min = 1,
-        max = 64,
+        min = POSITION_TITLE_MIN_LENGTH,
+        max = POSITION_TITLE_MAX_LENGTH,
         message = "Position title must be between 1 and 64 characters"
     ))]
     pub position_title: String,
@@ -39,14 +41,14 @@ pub struct CreateJobDTO {
     #[validate(custom(function = "validate_job_type"))]
     pub job_type: String,
     #[validate(range(
-        min = 1,
-        max = 24,
+        min = DAILY_WORK_HOURS_MIN,
+        max = DAILY_WORK_HOURS_MAX,
         message = "Daily work hours must be between 1 and 24"
     ))]
     pub daily_work_hours: i32,
     #[validate(range(
-        min = 1,
-        max = 31,
+        min = WORKDAYS_PER_MONTH_MIN,
+        max = WORKDAYS_PER_MONTH_MAX,
         message = "Workdays per month must be between 1 and 31"
     ))]
     pub workdays_per_month: i32,
@@ -56,14 +58,14 @@ pub struct CreateJobDTO {
 #[serde(rename_all = "camelCase")]
 pub struct UpdateJobDTO {
     #[validate(length(
-        min = 1,
-        max = 64,
+        min = COMPANY_NAME_MIN_LENGTH,
+        max = COMPANY_NAME_MAX_LENGTH,
         message = "Company name must be between 1 and 64 characters"
     ))]
     pub company_name: Option<String>,
     #[validate(length(
-        min = 1,
-        max = 64,
+        min = POSITION_TITLE_MIN_LENGTH,
+        max = POSITION_TITLE_MAX_LENGTH,
         message = "Position title must be between 1 and 64 characters"
     ))]
     pub position_title: Option<String>,
@@ -72,64 +74,49 @@ pub struct UpdateJobDTO {
     #[validate(custom(function = "validate_job_type"))]
     pub job_type: Option<String>,
     #[validate(range(
-        min = 1,
-        max = 24,
+        min = DAILY_WORK_HOURS_MIN,
+        max = DAILY_WORK_HOURS_MAX,
         message = "Daily work hours must be between 1 and 24"
     ))]
     pub daily_work_hours: Option<i32>,
     #[validate(range(
-        min = 1,
-        max = 31,
+        min = WORKDAYS_PER_MONTH_MIN,
+        max = WORKDAYS_PER_MONTH_MAX,
         message = "Workdays per month must be between 1 and 31"
     ))]
     pub workdays_per_month: Option<i32>,
 }
 
-impl TryFrom<JobModel> for GetJobDTO {
-    type Error = String;
-
-    fn try_from(job_model: JobModel) -> Result<Self, Self::Error> {
-        let job_type_str = match job_model.job_type {
-            job_model::JobType::CLT => "clt",
-            job_model::JobType::PJ => "pj",
-            job_model::JobType::Freelance => "freelance",
-        }
-        .to_string();
-
-        Ok(GetJobDTO {
+impl From<JobModel> for GetJobDTO {
+    fn from(job_model: JobModel) -> Self {
+        GetJobDTO {
             id: job_model.id,
             created_at: job_model.created_at,
             updated_at: job_model.updated_at,
             company_name: job_model.company_name,
             position_title: job_model.position_title,
             salary_gross: job_model.salary_gross,
-            job_type: job_type_str,
+            job_type: job_model.job_type.as_str().to_string(),
             daily_work_hours: job_model.daily_work_hours,
             workdays_per_month: job_model.workdays_per_month,
             profile_owner_id: job_model.profile_owner_id,
-        })
+        }
     }
 }
 
-impl TryInto<NewJobModel> for CreateJobDTO {
+impl TryInto<CreateJobModel> for CreateJobDTO {
     type Error = String;
 
-    fn try_into(self) -> Result<NewJobModel, Self::Error> {
-        let job_type_enum = match self.job_type.to_lowercase().as_str() {
-            "clt" => job_model::JobType::CLT,
-            "pj" => job_model::JobType::PJ,
-            "freelance" => job_model::JobType::Freelance,
-            _ => return Err("Invalid job type".into()),
-        };
+    fn try_into(self) -> Result<CreateJobModel, Self::Error> {
+        let job_type_enum = JobType::from_str(&self.job_type)?;
 
-        Ok(NewJobModel {
+        Ok(CreateJobModel {
             company_name: self.company_name,
             position_title: self.position_title,
             salary_gross: self.salary_gross,
             job_type: job_type_enum,
             daily_work_hours: self.daily_work_hours,
             workdays_per_month: self.workdays_per_month,
-            profile_owner_id: 0, // This should be set in the service layer
         })
     }
 }
@@ -138,15 +125,7 @@ impl TryInto<UpdateJobModel> for UpdateJobDTO {
     type Error = String;
 
     fn try_into(self) -> Result<UpdateJobModel, Self::Error> {
-        let job_type_enum = match self.job_type {
-            Some(ref jt) => match jt.to_lowercase().as_str() {
-                "clt" => Some(job_model::JobType::CLT),
-                "pj" => Some(job_model::JobType::PJ),
-                "freelance" => Some(job_model::JobType::Freelance),
-                _ => return Err("Invalid job type".into()),
-            },
-            None => None,
-        };
+        let job_type_enum = self.job_type.map(|jt| JobType::from_str(&jt)).transpose()?;
 
         Ok(UpdateJobModel {
             company_name: self.company_name,
@@ -160,8 +139,7 @@ impl TryInto<UpdateJobModel> for UpdateJobDTO {
 }
 
 fn validate_job_type(job_type: &str) -> Result<(), ValidationError> {
-    let valid_types = ["clt", "pj", "freelance"];
-    if valid_types.contains(&job_type.to_lowercase().as_str()) {
+    if JobType::all_values().contains(&job_type.to_lowercase().as_str()) {
         Ok(())
     } else {
         Err(ValidationError::new(
@@ -172,7 +150,7 @@ fn validate_job_type(job_type: &str) -> Result<(), ValidationError> {
 
 fn validate_salary_gross(salary: &Decimal) -> Result<(), ValidationError> {
     if salary.is_sign_negative() {
-        Err(ValidationError::new("Salary gross must be non-negative"))
+        Err(ValidationError::new(SALARY_GROSS_NEGATIVE_MESSAGE))
     } else {
         Ok(())
     }
