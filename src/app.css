@@ -50,8 +50,18 @@
     }
 }
 
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
 .glass-effect {
-    @apply border border-white/15 bg-white/8 backdrop-blur-3xl;
+    @apply bg-white/8 backdrop-blur-3xl;
 }
 
 .transition-smooth {

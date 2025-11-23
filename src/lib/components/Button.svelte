@@ -19,14 +19,18 @@
             | 'info'
             | 'neutral'
             | 'ghost'
-            | 'glass';
+            | 'glass'
+            | 'colorful';
         icon?: string;
         tooltip?: string;
         tooltipOrientation?: 'top' | 'bottom' | 'left' | 'right';
+        text?: 'center' | 'start' | 'end';
 
-        isJoinItem?: boolean;
-        isSoft?: boolean;
+        join?: boolean;
+        soft?: boolean;
         disabled?: boolean;
+        block?: boolean;
+        nobg?: boolean;
 
         onclick?: () => void;
     }
@@ -41,9 +45,12 @@
         icon,
         tooltip,
         tooltipOrientation = 'top',
-        isJoinItem,
-        isSoft,
+        text = 'center',
+        join: isJoinItem,
+        soft: isSoft,
         disabled = false,
+        block = false,
+        nobg = false,
         onclick
     }: Props = $props();
 
@@ -77,7 +84,8 @@
         info: 'btn-info',
         neutral: 'btn-neutral',
         ghost: 'btn-ghost',
-        glass: 'glass-effect text-base-content'
+        glass: 'glass-effect text-base-content',
+        colorful: 'bg-linear-to-r from-primary/20 to-secondary/20 text-primary'
     };
 
     const tooltipOrientationClass = {
@@ -85,6 +93,12 @@
         bottom: 'tooltip-bottom',
         left: 'tooltip-left',
         right: 'tooltip-right'
+    };
+
+    const textClass = {
+        center: 'justify-center',
+        start: 'justify-start',
+        end: 'justify-end'
     };
 </script>
 
@@ -106,6 +120,9 @@
         transition-smooth
         hover:scale-105
         active:scale-95
+        {text ? textClass[text] : ''}
+        {block ? 'flex' : 'inline-flex'}
+        {nobg ? 'bg-transparent hover:bg-transparent active:bg-transparent border-0' : ''}
     "
     {onclick}
     data-tip={tooltip}
