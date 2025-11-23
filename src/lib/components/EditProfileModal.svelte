@@ -136,7 +136,7 @@
             <fieldset class="fieldset">
                 <legend class="fieldset-legend gap-1">Username</legend>
                 <label
-                    class="input input-ghost transition-smooth w-full"
+                    class="transition-smooth input w-full"
                     class:input-error={error?.field === 'username'}
                 >
                     <iconify-icon icon="mdi:user"></iconify-icon>
@@ -154,7 +154,7 @@
             <fieldset class="fieldset">
                 <legend class="fieldset-legend">Display Name</legend>
                 <label
-                    class="input input-ghost transition-smooth w-full"
+                    class="transition-smooth input w-full"
                     class:input-error={error?.field === 'display_name'}
                 >
                     <iconify-icon icon="mdi:account"></iconify-icon>
@@ -203,7 +203,7 @@
                         <input
                             type="file"
                             accept="image/*"
-                            class="file-input file-input-ghost w-full"
+                            class="file-input w-full"
                             class:file-input-error={error?.field === 'profile_picture_bytes'}
                             onchange={handleFileChange}
                             bind:this={fileInputElement}

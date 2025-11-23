@@ -92,6 +92,7 @@
     type={buttonType}
     class="
         btn
+        font-normal
         {width ? widthClass[width] : ''}
         {sizeClass[size]}
         {layout ? layoutClass[layout] : ''}
