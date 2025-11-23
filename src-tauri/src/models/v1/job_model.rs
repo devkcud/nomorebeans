@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+use rust_decimal::Decimal;
 use sqlx::{FromRow, Type};
 
 #[derive(Type, Debug)]
@@ -19,7 +20,7 @@ pub struct JobModel {
 
     pub company_name: String,
     pub position_title: String,
-    pub salary_gross: i64,
+    pub salary_gross: Decimal,
 
     pub job_type: JobType,
 
@@ -33,7 +34,7 @@ pub struct JobModel {
 pub struct NewJobModel {
     pub company_name: String,
     pub position_title: String,
-    pub salary_gross: i64,
+    pub salary_gross: Decimal,
     pub job_type: JobType,
     pub daily_work_hours: i32,
     pub workdays_per_month: i32,
@@ -44,7 +45,7 @@ pub struct NewJobModel {
 pub struct UpdateJobModel {
     pub company_name: Option<String>,
     pub position_title: Option<String>,
-    pub salary_gross: Option<i64>,
+    pub salary_gross: Option<Decimal>,
     pub job_type: Option<JobType>,
     pub daily_work_hours: Option<i32>,
     pub workdays_per_month: Option<i32>,

@@ -19,8 +19,9 @@ dirs = "5"
 dotenvy = "0.15.7"
 image = {version = "0.25.8", features = ["webp"] }
 regex = "1.12.2"
+rust_decimal = { version = "1.36.0", features = ["serde", "db-postgres"] }
 serde = "1.0.228"
-sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "chrono"] }
+sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "chrono", "rust_decimal"] }
 tauri = { version = "2", features = [] }
 tauri-plugin-fs = "2"
 tauri-plugin-opener = "2"

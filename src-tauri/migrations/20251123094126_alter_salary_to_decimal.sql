@@ -1,0 +1,1 @@
+ALTER TABLE jobs ALTER COLUMN salary_gross TYPE DECIMAL(12, 2);

@@ -1,1 +1,0 @@
-pub const ARITHMETIC_SCALE: u32 = 1_000_000;
