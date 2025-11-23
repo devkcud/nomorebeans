@@ -47,3 +47,51 @@ pub async fn update_profile(
 ) -> Result<GetProfileDTO, ErrorResponse> {
     state.profile_service.update_profile(id, profile).await
 }
+
+#[tauri::command]
+pub async fn create_job(
+    state: State<'_, AppState>,
+    profile_id: i32,
+    job: crate::services::dto::job_dto::CreateJobDTO,
+) -> Result<crate::services::dto::job_dto::GetJobDTO, ErrorResponse> {
+    state.job_service.create(profile_id, job).await
+}
+
+#[tauri::command]
+pub async fn get_jobs(
+    state: State<'_, AppState>,
+    profile_id: i32,
+) -> Result<Vec<crate::services::dto::job_dto::GetJobDTO>, ErrorResponse> {
+    state.job_service.get_all(profile_id).await
+}
+
+#[tauri::command]
+pub async fn get_job_by_id(
+    state: State<'_, AppState>,
+    profile_id: i32,
+    job_id: i32,
+) -> Result<crate::services::dto::job_dto::GetJobDTO, ErrorResponse> {
+    state.job_service.get_one_by_id(profile_id, job_id).await
+}
+
+#[tauri::command]
+pub async fn delete_job(
+    state: State<'_, AppState>,
+    profile_id: i32,
+    job_id: i32,
+) -> Result<(), ErrorResponse> {
+    state.job_service.delete_one_by_id(profile_id, job_id).await
+}
+
+#[tauri::command]
+pub async fn update_job(
+    state: State<'_, AppState>,
+    profile_id: i32,
+    job_id: i32,
+    job: crate::services::dto::job_dto::UpdateJobDTO,
+) -> Result<crate::services::dto::job_dto::GetJobDTO, ErrorResponse> {
+    state
+        .job_service
+        .update_one_by_id(profile_id, job_id, job)
+        .await
+}

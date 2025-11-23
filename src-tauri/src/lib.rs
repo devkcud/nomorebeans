@@ -29,7 +29,12 @@ pub fn run() {
                 command::get_profile_by_id,
                 command::get_profile_by_username,
                 command::delete_profile,
-                command::update_profile
+                command::update_profile,
+                command::create_job,
+                command::get_jobs,
+                command::get_job_by_id,
+                command::delete_job,
+                command::update_job
             ])
             .run(generate_context!())
             .expect("error while running tauri application");

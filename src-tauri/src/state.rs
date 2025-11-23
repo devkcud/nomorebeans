@@ -1,9 +1,13 @@
 pub use crate::services;
-use crate::{repositories::v1::profile_repository::ProfileRepository, services::profile_service::ProfileService};
+use crate::{
+    repositories::v1::{job_repository::JobRepository, profile_repository::ProfileRepository},
+    services::{job_service::JobService, profile_service::ProfileService},
+};
 
 #[derive(Clone)]
 pub struct AppState {
     pub profile_service: ProfileService,
+    pub job_service: JobService,
 }
 
 impl AppState {
@@ -12,6 +16,13 @@ impl AppState {
         let profile_repo = ProfileRepository::new(pool.clone());
         let profile_service = ProfileService::new(profile_repo);
 
-        Self { profile_service }
+        // Job:
+        let job_repo = JobRepository::new(pool.clone());
+        let job_service = JobService::new(job_repo);
+
+        Self {
+            profile_service,
+            job_service,
+        }
     }
 }
