@@ -1,5 +1,8 @@
 use crate::{
-    services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO, UpdateProfileDTO},
+    services::dto::{
+        job_dto::{CreateJobDTO, GetJobDTO, UpdateJobDTO},
+        profile_dto::{CreateProfileDTO, GetProfileDTO, UpdateProfileDTO},
+    },
     state::AppState,
     utils::error::mapping::ErrorResponse,
 };
@@ -7,7 +10,7 @@ use tauri::State;
 
 #[tauri::command]
 pub async fn get_profiles(state: State<'_, AppState>) -> Result<Vec<GetProfileDTO>, ErrorResponse> {
-    state.profile_service.get_all().await
+    state.profile_service.fetch_all().await
 }
 
 #[tauri::command]
@@ -15,7 +18,7 @@ pub async fn create_profile(
     state: State<'_, AppState>,
     profile: CreateProfileDTO,
 ) -> Result<GetProfileDTO, ErrorResponse> {
-    state.profile_service.create_profile(profile).await
+    state.profile_service.create(profile).await
 }
 
 #[tauri::command]
@@ -23,7 +26,7 @@ pub async fn get_profile_by_id(
     state: State<'_, AppState>,
     id: i32,
 ) -> Result<GetProfileDTO, ErrorResponse> {
-    state.profile_service.get_one_by_id(id).await
+    state.profile_service.fetch_by_id(id).await
 }
 
 #[tauri::command]
@@ -31,12 +34,12 @@ pub async fn get_profile_by_username(
     state: State<'_, AppState>,
     username: &str,
 ) -> Result<GetProfileDTO, ErrorResponse> {
-    state.profile_service.get_one_by_username(username).await
+    state.profile_service.fetch_by_username(username).await
 }
 
 #[tauri::command]
 pub async fn delete_profile(state: State<'_, AppState>, id: i32) -> Result<(), ErrorResponse> {
-    state.profile_service.delete_profile(id).await
+    state.profile_service.delete(id).await
 }
 
 #[tauri::command]
@@ -45,15 +48,15 @@ pub async fn update_profile(
     id: i32,
     profile: UpdateProfileDTO,
 ) -> Result<GetProfileDTO, ErrorResponse> {
-    state.profile_service.update_profile(id, profile).await
+    state.profile_service.update(id, profile).await
 }
 
 #[tauri::command]
 pub async fn create_job(
     state: State<'_, AppState>,
     profile_id: i32,
-    job: crate::services::dto::job_dto::CreateJobDTO,
-) -> Result<crate::services::dto::job_dto::GetJobDTO, ErrorResponse> {
+    job: CreateJobDTO,
+) -> Result<GetJobDTO, ErrorResponse> {
     state.job_service.create(profile_id, job).await
 }
 
@@ -61,8 +64,8 @@ pub async fn create_job(
 pub async fn get_jobs(
     state: State<'_, AppState>,
     profile_id: i32,
-) -> Result<Vec<crate::services::dto::job_dto::GetJobDTO>, ErrorResponse> {
-    state.job_service.get_all(profile_id).await
+) -> Result<Vec<GetJobDTO>, ErrorResponse> {
+    state.job_service.fetch_all_for_profile(profile_id).await
 }
 
 #[tauri::command]
@@ -70,8 +73,8 @@ pub async fn get_job_by_id(
     state: State<'_, AppState>,
     profile_id: i32,
     job_id: i32,
-) -> Result<crate::services::dto::job_dto::GetJobDTO, ErrorResponse> {
-    state.job_service.get_one_by_id(profile_id, job_id).await
+) -> Result<GetJobDTO, ErrorResponse> {
+    state.job_service.fetch_by_id(profile_id, job_id).await
 }
 
 #[tauri::command]
@@ -80,7 +83,7 @@ pub async fn delete_job(
     profile_id: i32,
     job_id: i32,
 ) -> Result<(), ErrorResponse> {
-    state.job_service.delete_one_by_id(profile_id, job_id).await
+    state.job_service.delete(profile_id, job_id).await
 }
 
 #[tauri::command]
@@ -88,10 +91,7 @@ pub async fn update_job(
     state: State<'_, AppState>,
     profile_id: i32,
     job_id: i32,
-    job: crate::services::dto::job_dto::UpdateJobDTO,
-) -> Result<crate::services::dto::job_dto::GetJobDTO, ErrorResponse> {
-    state
-        .job_service
-        .update_one_by_id(profile_id, job_id, job)
-        .await
+    job: UpdateJobDTO,
+) -> Result<GetJobDTO, ErrorResponse> {
+    state.job_service.update(profile_id, job_id, job).await
 }

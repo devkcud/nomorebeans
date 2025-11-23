@@ -2,7 +2,7 @@ use crate::{
     models::v1::profile_model::ProfileModel,
     repositories,
     services::dto::profile_dto::{CreateProfileDTO, GetProfileDTO, UpdateProfileDTO},
-    utils::error::mapping::{ErrorCode, ErrorResponse},
+    utils::error::mapping::ErrorResponse,
 };
 use validator::Validate;
 
@@ -16,82 +16,68 @@ impl ProfileService {
         Self { repo }
     }
 
-    pub async fn create_profile(
-        &self,
-        profile: CreateProfileDTO,
-    ) -> Result<GetProfileDTO, ErrorResponse> {
+    pub async fn create(&self, profile: CreateProfileDTO) -> Result<GetProfileDTO, ErrorResponse> {
         profile.validate()?;
 
         let profile = self
             .repo
-            .create_profile(
+            .create(
                 profile.username,
                 profile.display_name,
                 profile.profile_picture_bytes,
             )
             .await?;
 
-        let dto = GetProfileDTO::try_from(profile).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
+        let dto = map_profile(profile)?;
 
         Ok(dto)
     }
 
-    pub async fn get_all(&self) -> Result<Vec<GetProfileDTO>, ErrorResponse> {
-        let users: Vec<ProfileModel> = self.repo.get_all().await?;
+    pub async fn fetch_all(&self) -> Result<Vec<GetProfileDTO>, ErrorResponse> {
+        let users: Vec<ProfileModel> = self.repo.fetch_all().await?;
         let dtos: Result<Vec<_>, _> = users.into_iter().map(GetProfileDTO::try_from).collect();
 
-        dtos.map_err(|_| ErrorResponse::unhandled()) // TODO: improve error handling
+        dtos.map_err(|_| ErrorResponse::unhandled())
     }
 
-    pub async fn get_one_by_id(&self, id: i32) -> Result<GetProfileDTO, ErrorResponse> {
-        let profile: Option<ProfileModel> = self.repo.get_one_by_id(id).await?;
+    pub async fn fetch_by_id(&self, id: i32) -> Result<GetProfileDTO, ErrorResponse> {
+        let profile: Option<ProfileModel> = self.repo.fetch_by_id(id).await?;
 
-        if let None = profile {
-            return Err(ErrorResponse::new(
-                ErrorCode::SearchObjectNotFoundError,
-                Some("id".into()),
-                "Profile not found",
-            ));
-        }
-
-        let dto =
-            GetProfileDTO::try_from(profile.unwrap()).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
-
-        Ok(dto)
+        profile
+            .map(map_profile)
+            .transpose()?
+            .ok_or(ErrorResponse::object_not_found("id", "Profile not found"))
     }
 
-    pub async fn get_one_by_username(
+    pub async fn fetch_by_username(
         &self,
         username: impl Into<String>,
     ) -> Result<GetProfileDTO, ErrorResponse> {
-        let profile: Option<ProfileModel> = self.repo.get_one_by_username(username.into()).await?;
+        let profile: Option<ProfileModel> = self.repo.fetch_by_username(username.into()).await?;
 
-        if let None = profile {
-            return Err(ErrorResponse::new(
-                ErrorCode::SearchObjectNotFoundError,
-                Some("username".into()),
+        profile
+            .map(map_profile)
+            .transpose()?
+            .ok_or(ErrorResponse::object_not_found(
+                "username",
                 "Profile not found",
-            ));
-        }
-
-        let dto =
-            GetProfileDTO::try_from(profile.unwrap()).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
-
-        Ok(dto)
+            ))
     }
 
-    pub async fn delete_profile(&self, id: i32) -> Result<(), ErrorResponse> {
-        self.repo.delete_profile(id).await
+    pub async fn delete(&self, id: i32) -> Result<(), ErrorResponse> {
+        self.repo.delete(id).await
     }
 
-    pub async fn update_profile(
+    pub async fn update(
         &self,
         id: i32,
         profile: UpdateProfileDTO,
     ) -> Result<GetProfileDTO, ErrorResponse> {
+        profile.validate()?;
+
         let profile = self
             .repo
-            .update_profile(
+            .update(
                 id,
                 profile.username,
                 profile.display_name,
@@ -99,8 +85,12 @@ impl ProfileService {
             )
             .await?;
 
-        let dto = GetProfileDTO::try_from(profile).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
+        let dto = map_profile(profile)?;
 
         Ok(dto)
     }
+}
+
+fn map_profile(model: ProfileModel) -> Result<GetProfileDTO, ErrorResponse> {
+    GetProfileDTO::try_from(model).map_err(|_| ErrorResponse::unhandled())
 }

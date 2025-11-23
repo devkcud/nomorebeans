@@ -1,10 +1,10 @@
-use validator::Validate;
-
 use crate::{
+    models::v1::job_model::JobModel,
     repositories::v1::job_repository,
     services::dto::job_dto::{CreateJobDTO, GetJobDTO, UpdateJobDTO},
     utils::error::mapping::ErrorResponse,
 };
+use validator::Validate;
 
 #[derive(Clone)]
 pub struct JobService {
@@ -27,73 +27,70 @@ impl JobService {
             .repo
             .create(
                 profile_id,
-                &new_job.try_into().map_err(|_| ErrorResponse::unhandled())?, // TODO: improve error handling
+                &new_job.try_into().map_err(|_| ErrorResponse::unhandled())?,
             )
             .await?;
 
-        let dto = GetJobDTO::try_from(job).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
+        let dto = map_job(job)?;
 
         Ok(dto)
     }
 
-    pub async fn get_all(&self, profile_id: i32) -> Result<Vec<GetJobDTO>, ErrorResponse> {
-        let jobs = self.repo.get_all(profile_id).await;
-        let dtos = jobs?
+    pub async fn fetch_all_for_profile(
+        &self,
+        profile_id: i32,
+    ) -> Result<Vec<GetJobDTO>, ErrorResponse> {
+        let jobs = self.repo.fetch_all_for_profile(profile_id).await?;
+        let dtos = jobs
             .into_iter()
-            .map(|job| GetJobDTO::try_from(job))
+            .map(GetJobDTO::try_from)
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
+            .map_err(|_| ErrorResponse::unhandled())?;
 
         Ok(dtos)
     }
 
-    pub async fn get_one_by_id(
+    pub async fn fetch_by_id(
         &self,
         profile_id: i32,
         job_id: i32,
     ) -> Result<GetJobDTO, ErrorResponse> {
-        let job = self.repo.get_by_id(profile_id, job_id).await?;
+        let job = self.repo.fetch_by_id(profile_id, job_id).await?;
 
-        if let None = job {
-            return Err(ErrorResponse::new(
-                crate::utils::error::mapping::ErrorCode::SearchObjectNotFoundError,
-                Some("id".into()),
-                "Job not found",
-            ));
-        }
-
-        let dto = GetJobDTO::try_from(job.unwrap()).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
-
-        Ok(dto)
+        job.map(map_job)
+            .transpose()?
+            .ok_or(ErrorResponse::object_not_found("id", "Job not found"))
     }
 
-    pub async fn delete_one_by_id(
-        &self,
-        profile_id: i32,
-        job_id: i32,
-    ) -> Result<(), ErrorResponse> {
-        self.repo.delete_job(profile_id, job_id).await
+    pub async fn delete(&self, profile_id: i32, job_id: i32) -> Result<(), ErrorResponse> {
+        self.repo.delete(profile_id, job_id).await
     }
 
-    pub async fn update_one_by_id(
+    pub async fn update(
         &self,
         profile_id: i32,
         job_id: i32,
         updated_job: UpdateJobDTO,
     ) -> Result<GetJobDTO, ErrorResponse> {
+        updated_job.validate()?;
+
         let job = self
             .repo
             .update(
-                job_id,
                 profile_id,
+                job_id,
                 updated_job
                     .try_into()
-                    .map_err(|_| ErrorResponse::unhandled())?, // TODO: improve error handling
+                    .map_err(|_| ErrorResponse::unhandled())?,
             )
             .await?;
 
-        let dto = GetJobDTO::try_from(job).map_err(|_| ErrorResponse::unhandled())?; // TODO: improve error handling
+        let dto = map_job(job)?;
 
         Ok(dto)
     }
+}
+
+fn map_job(model: JobModel) -> Result<GetJobDTO, ErrorResponse> {
+    GetJobDTO::try_from(model).map_err(|_| ErrorResponse::unhandled())
 }

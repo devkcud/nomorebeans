@@ -21,6 +21,14 @@ impl ErrorResponse {
         Self::new(ErrorCode::UnhandledError, None, "Unhandled error")
     }
 
+    pub fn object_not_found(field: impl Into<String>, message: impl Into<String>) -> Self {
+        Self::new(
+            ErrorCode::SearchObjectNotFoundError,
+            Some(field.into()),
+            message.into(),
+        )
+    }
+
     pub fn with_field(mut self, field: impl Into<String>) -> Self {
         self.field = Some(field.into());
         self

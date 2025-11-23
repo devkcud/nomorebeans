@@ -1,6 +1,5 @@
-use sqlx::PgPool;
-
 use crate::{models::v1::job_model, utils::error::mapping::ErrorResponse};
+use sqlx::PgPool;
 
 #[derive(Clone)]
 pub struct JobRepository {
@@ -37,7 +36,7 @@ impl JobRepository {
         Ok(created_job)
     }
 
-    pub async fn get_all(
+    pub async fn fetch_all_for_profile(
         &self,
         profile_id: i32,
     ) -> Result<Vec<job_model::JobModel>, ErrorResponse> {
@@ -55,7 +54,7 @@ impl JobRepository {
         Ok(jobs)
     }
 
-    pub async fn get_by_id(
+    pub async fn fetch_by_id(
         &self,
         profile_id: i32,
         job_id: i32,
@@ -76,8 +75,8 @@ impl JobRepository {
 
     pub async fn update(
         &self,
-        job_id: i32,
         profile_id: i32,
+        job_id: i32,
         updated_job: job_model::UpdateJobModel,
     ) -> Result<job_model::JobModel, ErrorResponse> {
         let updated_job = sqlx::query_as::<_, job_model::JobModel>(
@@ -108,7 +107,7 @@ impl JobRepository {
         Ok(updated_job)
     }
 
-    pub async fn delete_job(&self, job_id: i32, profile_id: i32) -> Result<(), ErrorResponse> {
+    pub async fn delete(&self, profile_id: i32, job_id: i32) -> Result<(), ErrorResponse> {
         sqlx::query(
             r#"
             UPDATE jobs SET deleted_at = NOW()

@@ -1,9 +1,8 @@
-use sqlx::PgPool;
-
 use crate::{
     models::v1::profile_model,
     utils::{error::mapping::ErrorResponse, fs::profile_picture},
 };
+use sqlx::PgPool;
 
 #[derive(Clone)]
 pub struct ProfileRepository {
@@ -15,7 +14,7 @@ impl ProfileRepository {
         Self { pool }
     }
 
-    pub async fn create_profile(
+    pub async fn create(
         &self,
         username: String,
         display_name: Option<String>,
@@ -50,7 +49,7 @@ impl ProfileRepository {
         Ok(created_profile)
     }
 
-    pub async fn get_all(&self) -> Result<Vec<profile_model::ProfileModel>, ErrorResponse> {
+    pub async fn fetch_all(&self) -> Result<Vec<profile_model::ProfileModel>, ErrorResponse> {
         let profiles = sqlx::query_as::<_, profile_model::ProfileModel>(
             r#"
             SELECT * FROM profiles WHERE deleted_at IS NULL
@@ -62,7 +61,7 @@ impl ProfileRepository {
         Ok(profiles)
     }
 
-    pub async fn get_one_by_id(
+    pub async fn fetch_by_id(
         &self,
         profile_id: i32,
     ) -> Result<Option<profile_model::ProfileModel>, ErrorResponse> {
@@ -78,7 +77,7 @@ impl ProfileRepository {
         Ok(profile)
     }
 
-    pub async fn get_one_by_username(
+    pub async fn fetch_by_username(
         &self,
         profile_username: String,
     ) -> Result<Option<profile_model::ProfileModel>, ErrorResponse> {
@@ -94,7 +93,7 @@ impl ProfileRepository {
         Ok(profile)
     }
 
-    pub async fn delete_profile(&self, profile_id: i32) -> Result<(), ErrorResponse> {
+    pub async fn delete(&self, profile_id: i32) -> Result<(), ErrorResponse> {
         sqlx::query(
             r#"
             UPDATE profiles
@@ -110,7 +109,7 @@ impl ProfileRepository {
         Ok(())
     }
 
-    pub async fn update_profile(
+    pub async fn update(
         &self,
         profile_id: i32,
         username: Option<String>,

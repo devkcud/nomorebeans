@@ -1,2 +1,2 @@
-pub mod profile_repository;
 pub mod job_repository;
+pub mod profile_repository;
