@@ -37,51 +37,14 @@
             id: 1,
             path: '/dashboard',
             label: 'Dashboard',
-            icon: 'mdi:view-dashboard',
-            newTab: false
+            icon: 'mdi:view-dashboard'
         },
         {
             id: 2,
-            name: 'Management',
-            icon: 'mdi:folder-cog',
-            items: [
-                { id: 3, path: '/profiles', label: 'Profiles', icon: 'mdi:account-multiple' },
-                { id: 4, path: '/accounts', label: 'Accounts', icon: 'mdi:bank' },
-                { id: 13, path: '/cards', label: 'Cards', icon: 'mdi:credit-card' },
-                { id: 5, path: '/transactions', label: 'Transactions', icon: 'mdi:swap-horizontal' }
-            ]
-        },
-        {
-            id: 6,
-            name: 'Reports',
-            icon: 'mdi:file-chart',
-            items: [
-                { id: 7, path: '/reports/summary', label: 'Summary', icon: 'mdi:chart-pie' },
-                { id: 8, path: '/reports/trends', label: 'Trends', icon: 'mdi:chart-line' },
-                {
-                    id: 10,
-                    name: 'Data Transfer',
-                    icon: 'mdi:database',
-                    items: [
-                        {
-                            id: 11,
-                            path: '/reports/import',
-                            label: 'Import Data',
-                            icon: 'mdi:database-import'
-                        },
-                        {
-                            id: 12,
-                            path: '/reports/export',
-                            label: 'Export Data',
-                            icon: 'mdi:database-export'
-                        }
-                    ]
-                }
-            ]
-        },
-        { id: 9, path: '/settings', label: 'Settings', icon: 'mdi:cog' },
-        { id: 14, path: '/logs', label: 'Logs', icon: 'mdi:clipboard-text' },
-        { id: 15, path: '/help', label: 'Help', icon: 'mdi:help-circle' }
+            path: '/jobs',
+            label: 'Jobs',
+            icon: 'mdi:briefcase'
+        }
     ];
 
     let expandedFolders = $state<Set<string>>(new Set([]));
@@ -276,13 +239,13 @@
             </div>
 
             <div class="p-4">
-                <Button icon="mdi:logout" color="error" width="full" onclick={handleLogout}>
+                <Button icon="mdi:logout" soft color="error" width="full" onclick={handleLogout}>
                     Logout
                 </Button>
             </div>
         </aside>
 
-        <main class="flex-1 overflow-auto border-t border-white/10 no-scrollbar">
+        <main class="no-scrollbar flex-1 overflow-auto border-t border-white/10">
             <div class="relative min-h-full overflow-hidden">
                 <div class="absolute inset-x-0 top-0 h-128 bg-linear-to-b from-primary/10"></div>
                 {@render children()}
