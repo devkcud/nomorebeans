@@ -6,3 +6,5 @@ export const MAX_DISPLAY_NAME_LENGTH = 32;
 export const MODAL_CLOSE_ANIMATION_MS = 300;
 
 export const AVATAR_DATA_URI_PREFIX = 'data:image/webp;base64,';
+
+export const GITHUB_ISSUES_URL = 'https://github.com/devkcud/nomorebeans/issues/new';
