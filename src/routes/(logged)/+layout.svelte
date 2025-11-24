@@ -248,7 +248,10 @@
         <main class="no-scrollbar flex-1 overflow-auto border-t border-white/10">
             <div class="relative min-h-full overflow-hidden">
                 <div class="absolute inset-x-0 top-0 h-128 bg-linear-to-b from-primary/10"></div>
-                {@render children()}
+
+                <div class="relative space-y-6 p-8">
+                    {@render children()}
+                </div>
             </div>
         </main>
     </div>
