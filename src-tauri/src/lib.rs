@@ -5,12 +5,11 @@ pub mod services;
 pub mod state;
 pub mod utils;
 
+use crate::state::AppState;
 use dotenvy::dotenv;
 use sqlx::PgPool;
 use std::env;
 use tauri::{async_runtime, generate_context, generate_handler, Builder};
-
-use crate::state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -23,6 +22,7 @@ pub fn run() {
         Builder::default()
             .manage(AppState::new(pool))
             .plugin(tauri_plugin_fs::init())
+            .plugin(tauri_plugin_opener::init())
             .invoke_handler(generate_handler![
                 command::get_profiles,
                 command::create_profile,
