@@ -120,7 +120,7 @@
                 <span class="loading loading-lg loading-spinner"></span>
             </div>
         {:else if loadProfilesError}
-            <div class="alert alert-error max-w-4xl">
+            <div class="alert max-w-4xl alert-error">
                 <iconify-icon icon="mdi:alert-circle" class="text-xl"></iconify-icon>
                 <div>
                     <h3 class="font-bold">Failed to load profiles</h3>
@@ -133,7 +133,9 @@
                 <iconify-icon icon="mdi:account-off" class="text-6xl text-accent"></iconify-icon>
                 <div class="text-center">
                     <h3 class="text-xl font-bold">No profiles yet</h3>
-                    <p class="text-sm text-neutral-content/50">Create your first profile to get started</p>
+                    <p class="text-sm text-neutral-content/50">
+                        Create your first profile to get started
+                    </p>
                 </div>
                 <Button
                     icon="mdi:account-plus"
@@ -160,7 +162,9 @@
                                 <tr class="hover">
                                     <td>
                                         <div class="avatar">
-                                            <div class="size-12 rounded-full ring-2 ring-primary/30">
+                                            <div
+                                                class="size-12 rounded-full ring-2 ring-primary/30"
+                                            >
                                                 <img
                                                     src={profile.avatar}
                                                     alt="{profile.username}'s avatar"
@@ -170,16 +174,13 @@
                                     </td>
                                     <td>
                                         <div class="flex items-center gap-2">
-                                            <iconify-icon icon="mdi:user" class="text-primary"></iconify-icon>
+                                            <iconify-icon icon="mdi:user" class="text-primary"
+                                            ></iconify-icon>
                                             <span class="font-medium">{profile.username}</span>
                                         </div>
                                     </td>
                                     <td>
-                                        {#if profile.displayName}
-                                            <span>{profile.displayName}</span>
-                                        {:else}
-                                            <span class="italic text-neutral-content/60">None</span>
-                                        {/if}
+                                        <span>{profile.displayName}</span>
                                     </td>
                                     <td>
                                         <div class="flex justify-end gap-2">
@@ -237,7 +238,7 @@
 
             <p class="py-4">
                 Are you sure you want to delete
-                <strong>{profileToDelete?.displayName || profileToDelete?.username}</strong>? This
+                <strong>{profileToDelete?.displayName}</strong>? This
                 action cannot be undone.
             </p>
 

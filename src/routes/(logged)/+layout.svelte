@@ -83,7 +83,7 @@
                 </div>
                 <div class="flex-1 overflow-hidden">
                     <p class="truncate text-sm font-semibold">
-                        {currentProfile?.displayName || currentProfile?.username}
+                        {currentProfile?.displayName}
                     </p>
                     <p class="truncate text-xs opacity-60">@{currentProfile?.username}</p>
                 </div>

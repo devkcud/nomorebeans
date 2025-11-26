@@ -32,7 +32,7 @@
 
         <article class="relative">
             <Title header={3} size="md" colored bold>
-                {profile.displayName ?? profile.username}
+                {profile.displayName}
             </Title>
             <p class="text-sm">@{profile.username}</p>
         </article>
@@ -54,7 +54,7 @@
             <h2
                 class="bg-linear-to-r from-primary to-secondary bg-clip-text text-lg font-bold text-transparent"
             >
-                {profile.displayName ?? profile.username}
+                {profile.displayName}
             </h2>
             <p class="text-sm opacity-70">@{profile.username}</p>
         </div>

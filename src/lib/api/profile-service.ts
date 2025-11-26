@@ -7,18 +7,24 @@ import type {
 import { AVATAR_DATA_URI_PREFIX } from '$lib/constants';
 import { fileToBytes, getPlaceholderAvatarUrl } from '$lib/utils';
 
-function transformProfileAvatar(profile: GetProfileResponse): GetProfileResponse {
+function transformProfile(profile: GetProfileResponse): GetProfileResponse {
     return {
         ...profile,
         avatar: profile.avatar
             ? `${AVATAR_DATA_URI_PREFIX}${profile.avatar}`
-            : getPlaceholderAvatarUrl(profile.username)
+            : getPlaceholderAvatarUrl(profile.username),
+        displayName:
+            profile.displayName?.trim() === ''
+                ? profile.username
+                : (profile.displayName ?? profile.username)
     };
 }
 
 export async function getProfiles(): Promise<GetProfileResponse[]> {
     const profiles = await invoke<GetProfileResponse[]>('get_profiles');
-    return profiles.map(transformProfileAvatar);
+    let p = profiles.map(transformProfile);
+    console.log('Transformed profiles:', p);
+    return p;
 }
 
 export async function createProfile(profile: CreateProfileRequest): Promise<GetProfileResponse> {
@@ -32,7 +38,7 @@ export async function createProfile(profile: CreateProfileRequest): Promise<GetP
         }
     });
 
-    return transformProfileAvatar(result);
+    return transformProfile(result);
 }
 
 export async function updateProfile(
@@ -50,7 +56,7 @@ export async function updateProfile(
         }
     });
 
-    return transformProfileAvatar(result);
+    return transformProfile(result);
 }
 
 export async function deleteProfile(id: number): Promise<void> {
