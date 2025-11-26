@@ -82,11 +82,22 @@
                     </div>
                 </div>
                 <div class="flex-1 overflow-hidden">
-                    <p class="truncate text-sm font-semibold">
+                    <span
+                        class="truncate bg-linear-to-r from-primary to-secondary bg-clip-text text-sm font-semibold text-transparent"
+                    >
                         {currentProfile?.displayName}
-                    </p>
+                    </span>
                     <p class="truncate text-xs opacity-60">@{currentProfile?.username}</p>
                 </div>
+
+                <Button
+                    icon="mdi:logout"
+                    size="xs"
+                    layout="circle"
+                    color="error"
+                    soft
+                    onclick={handleLogout}
+                />
             </div>
 
             {#snippet renderFolder(folder: Folder)}
@@ -147,18 +158,8 @@
             {/snippet}
 
             <nav class="no-scrollbar flex-1 overflow-y-auto">
-                <div class="flex items-center justify-between bg-white/10 px-2">
+                <div class="flex items-center justify-between bg-white/10 px-2 py-1">
                     <h2 class="text-xs tracking-wider text-base-content/60">Navigation</h2>
-                    <Button
-                        icon="mdi:menu"
-                        size="xs"
-                        layout="circle"
-                        color="ghost"
-                        nobg
-                        onclick={() => {
-                            /* Implement mobile menu toggle if needed */
-                        }}
-                    />
                 </div>
 
                 <ul class="p-4">
@@ -185,64 +186,6 @@
                     {/each}
                 </ul>
             </nav>
-
-            <div class="bg-white/5 p-4">
-                <div class="flex items-center justify-between">
-                    <h3
-                        class="mb-2 text-xs font-semibold tracking-wider text-base-content/60 uppercase"
-                    >
-                        Performance
-                    </h3>
-
-                    <div class="inline-flex items-center gap-1">
-                        <iconify-icon icon="mdi:chevron-left" class="text-base text-secondary/20"
-                        ></iconify-icon>
-                        <iconify-icon icon="mdi:chevron-right" class="text-base text-secondary"
-                        ></iconify-icon>
-                    </div>
-                </div>
-                <div class="rounded-lg p-3">
-                    <div class="mb-2 flex items-center justify-between text-xs">
-                        <span class="text-base-content/60">This Month</span>
-                        <span class="font-semibold text-secondary">+12.5%</span>
-                    </div>
-                    <svg viewBox="0 0 200 60" class="w-full" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="graphGradient" x1="0" x2="0" y1="0" y2="1">
-                                <stop
-                                    offset="0%"
-                                    stop-color="currentColor"
-                                    stop-opacity="0.3"
-                                    class="text-secondary"
-                                />
-                                <stop
-                                    offset="100%"
-                                    stop-color="currentColor"
-                                    stop-opacity="0"
-                                    class="text-secondary"
-                                />
-                            </linearGradient>
-                        </defs>
-                        <path
-                            d="M 0 50 L 20 45 L 40 48 L 60 40 L 80 35 L 100 38 L 120 30 L 140 25 L 160 28 L 180 20 L 200 15 L 200 60 L 0 60 Z"
-                            fill="url(#graphGradient)"
-                        />
-                        <path
-                            d="M 0 50 L 20 45 L 40 48 L 60 40 L 80 35 L 100 38 L 120 30 L 140 25 L 160 28 L 180 20 L 200 15"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            class="text-secondary"
-                        />
-                    </svg>
-                </div>
-            </div>
-
-            <div class="p-4">
-                <Button icon="mdi:logout" soft color="error" width="full" onclick={handleLogout}>
-                    Logout
-                </Button>
-            </div>
         </aside>
 
         <main class="no-scrollbar flex-1 overflow-auto border-t border-white/10">
