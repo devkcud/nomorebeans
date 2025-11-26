@@ -100,7 +100,11 @@
         {:else if layout === 'grid'}
             <section class="flex max-w-5xl flex-wrap justify-center gap-6 *:shrink-0">
                 {#each profiles as profile (profile.id)}
-                    <ProfileCard {profile} variant="grid" onclick={() => handleProfileSelect(profile)} />
+                    <ProfileCard
+                        {profile}
+                        variant="grid"
+                        onclick={() => handleProfileSelect(profile)}
+                    />
                 {/each}
 
                 <button
@@ -126,7 +130,11 @@
             <section class="mb-6 flex w-full max-w-xl flex-col divide-y divide-neutral">
                 <div>
                     {#each profiles as profile (profile.id)}
-                        <ProfileCard {profile} variant="list" onclick={() => handleProfileSelect(profile)} />
+                        <ProfileCard
+                            {profile}
+                            variant="list"
+                            onclick={() => handleProfileSelect(profile)}
+                        />
                     {/each}
                 </div>
 
@@ -150,7 +158,9 @@
 
         <article class="mt-16 flex gap-2">
             <Button icon="mdi:cog" color="ghost">Settings</Button>
-            <Button icon="mdi:account-cog" color="ghost" onclick={goToManageUsers}>Manage Profiles</Button>
+            <Button icon="mdi:account-cog" color="ghost" onclick={goToManageUsers}
+                >Manage Profiles</Button
+            >
             <Button icon="mdi:dollar" color="primary">EzPay</Button>
         </article>
     </main>

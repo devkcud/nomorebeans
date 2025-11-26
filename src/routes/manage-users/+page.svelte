@@ -238,8 +238,7 @@
 
             <p class="py-4">
                 Are you sure you want to delete
-                <strong>{profileToDelete?.displayName}</strong>? This
-                action cannot be undone.
+                <strong>{profileToDelete?.displayName}</strong>? This action cannot be undone.
             </p>
 
             <div class="flex justify-end gap-2">

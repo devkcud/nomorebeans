@@ -129,7 +129,10 @@
                 <legend class="fieldset-legend gap-1">
                     Username <span class="text-error">*</span>
                 </legend>
-                <label class="input transition-smooth w-full" class:input-error={error?.field === 'username'}>
+                <label
+                    class="transition-smooth input w-full"
+                    class:input-error={error?.field === 'username'}
+                >
                     <iconify-icon icon="mdi:user"></iconify-icon>
                     <input
                         type="text"
@@ -145,7 +148,10 @@
 
             <fieldset class="fieldset">
                 <legend class="fieldset-legend">Display Name</legend>
-                <label class="input transition-smooth w-full" class:input-error={error?.field === 'display_name'}>
+                <label
+                    class="transition-smooth input w-full"
+                    class:input-error={error?.field === 'display_name'}
+                >
                     <iconify-icon icon="mdi:account"></iconify-icon>
                     <input
                         type="text"

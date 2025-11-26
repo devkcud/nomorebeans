@@ -122,7 +122,7 @@
         active:scale-95
         {text ? textClass[text] : ''}
         {block ? 'flex' : 'inline-flex'}
-        {nobg ? 'bg-transparent hover:bg-transparent active:bg-transparent border-0' : ''}
+        {nobg ? 'border-0 bg-transparent hover:bg-transparent active:bg-transparent' : ''}
     "
     {onclick}
     data-tip={tooltip}
