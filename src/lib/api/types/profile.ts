@@ -1,5 +1,7 @@
 export type GetProfileResponse = {
     id: number;
+    createdAt: Date;
+    updatedAt: Date;
     username: string;
     displayName: string;
     avatar: string;

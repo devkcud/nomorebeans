@@ -158,9 +158,9 @@
 
         <article class="mt-16 flex gap-2">
             <Button icon="mdi:cog" color="ghost">Settings</Button>
-            <Button icon="mdi:account-cog" color="ghost" onclick={goToManageUsers}
-                >Manage Profiles</Button
-            >
+            <Button icon="mdi:account-cog" color="ghost" onclick={goToManageUsers}>
+                Manage Profiles
+            </Button>
             <Button icon="mdi:dollar" color="primary">EzPay</Button>
         </article>
     </main>
